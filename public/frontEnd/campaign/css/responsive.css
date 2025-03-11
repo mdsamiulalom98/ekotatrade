@@ -1,0 +1,257 @@
+@media only screen and (min-width: 320px) and (max-width: 761px) {
+    body {
+        margin: 0;
+        padding: 0;
+        outline: 0;
+        font-family: "Tiro Bangla", serif;
+        font-size: 14px;
+    }
+
+    .ord_btn a {
+        font-size: 20px !important;
+    }
+
+    .why_choose_inn {
+        border-width: 5px;
+        padding: 5px;
+    }
+
+    .why_choose {
+        padding: 10px;
+    }
+
+    .why_choose_head {
+        width: 90%;
+    }
+
+    .review-title h3 {
+        font-size: 20px;
+    }
+
+    .cont_num {
+        width: 90%;
+    }
+
+    .discount_inn {
+        width: 90%;
+        margin: 10px auto;
+        padding: 5px;
+    }
+
+    .campro_inn {
+        padding: 20px;
+        border-width: 3px;
+    }
+
+    .campro_head h2 {
+        font-size: 18px;
+    }
+
+    .rules_sec {
+        padding: 30px 0;
+    }
+
+    .rules_head h2 {
+        border: 5px solid var(--brand-color);
+    }
+
+    .cont_inner {
+        padding: 20px 0;
+    }
+
+    .campro_img_item {
+        height: auto;
+    }
+
+    .why_choose_sec {
+        padding: 20px 0;
+    }
+
+    .campaign_item {
+        height: 300px;
+    }
+
+    .banner_t {
+        margin-top: 60px;
+    }
+
+    .banner_t h2 {
+        width: 100%;
+        font-size: 23px;
+    }
+
+    .megaoffer_btn {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .campaign_title {
+        font-size: 38px;
+        margin-top: 25px;
+    }
+
+    .cart_details {
+        margin-bottom: 15px;
+    }
+
+    .campaign_content {
+        display: block;
+    }
+
+    .row.order_by .col-sm-5 {
+        order: 1;
+    }
+
+    col.price_col {
+        min-width: 60px;
+    }
+
+    col.product_col {
+        min-width: 100px;
+    }
+
+    .qty-cart {
+        width: 62px;
+    }
+
+    .cartlist {
+        padding: 0;
+    }
+
+    .form_inn {
+        border-width: 3px;
+    }
+
+    .form_sec {
+        padding: 10px 0;
+    }
+
+    .campaign_offer {
+        font-size: 16px;
+    }
+
+    .discount_inn h2 p {
+        font-size: 16px;
+    }
+
+    .why_choose_head h2 {
+        font-size: 18px;
+    }
+
+    .form_inn {
+        padding: 10px;
+    }
+
+    .rules_inner {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .rules_item {
+        width: 100%;
+    }
+
+    .why_choose_midd {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .why_choose_widget {
+        width: 100%;
+    }
+
+    .why_choose_widget ul li {
+        line-height: 33px;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .qty-cart .quantity {
+        flex-direction: column;
+        border: none;
+        height: auto;
+        overflow: hidden;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .quantity button {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px 0;
+        cursor: pointer;
+        flex: auto;
+    }
+
+    .quantity button i {
+        font-size: 16px;
+    }
+
+    .quantity input {
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        width: 35px;
+        margin: 0;
+        pointer-events: none;
+    }
+
+
+    .coupon-section {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .coupon-card {
+        padding: 0px 10px;
+    }
+
+    .coupon-row {
+        margin: 5px auto;
+        height: 40px;
+    }
+
+    #cpnCode {
+        flex: 0 0 150px;
+        width: 150px;
+        height: 100%;
+    }
+
+    #cpnCode::placeholder {
+        font-size: 13px;
+        font-family: system-ui;
+    }
+
+    #cpnBtn {
+        flex: 1 1 auto;
+        border: 1px solid #fff;
+        font-size: 11px;
+        min-width: 100px;
+        height: 100%;
+        font-family: sans-serif;
+    }
+
+    .circle1,
+    .circle2 {
+        width: 30px;
+        height: 30px;
+    }
+
+    .circle1 {
+        left: -15px;
+    }
+
+    .circle2 {
+        right: -15px;
+    }
+
+}
