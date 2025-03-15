@@ -18,6 +18,13 @@
             font-size: 16px;
         }
 
+        .payment-success {
+            background-image: url(http://localhost/ekotatrade/public/frontEnd/images/paid.jpg);
+            background-repeat: no-repeat;
+            background-size: 170px 160px;
+            background-position: bottom center;
+        }
+
         @page {
             margin: 0px;
         }
@@ -51,17 +58,62 @@
     <section class="customer-invoice ">
         <div class="container">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                     <a href="{{ url('admin/order', $order->status->slug ?? '') }}" class="no-print"><strong><i
                                 class="fe-arrow-left"></i> Back To Order</strong></a>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-4 text-center">
                     <button onclick="printFunction()"class="no-print btn btn-xs btn-success waves-effect waves-light"><i
                             class="fa fa-print"></i></button>
                 </div>
+                <div class="col-sm-4 d-flex justify-content-center">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="no-print btn btn-xs btn-primary waves-effect waves-light"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Payment Change
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Payment Change</h5>
+                                    <button type="button" class="close btn btn-danger" data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form action="{{ route('order.payment.change') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="exampleSelect">Payment Status</label>
+                                            <select name="status" class="form-control form-select" id="exampleSelect">
+                                                <option value="paid">
+                                                    Paid
+                                                </option>
+                                                <option value="unpaid">
+                                                    Unpaid
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-sm-12 mt-3">
-                    <div class="invoice-innter"
-                        style="width:760px;margin: 0 auto;background: #fff;overflow: hidden;padding: 30px;padding-top: 0;">
+                    <div class="invoice-innter {{ $order->due > 0 ? 'payment-due' : 'payment-success' }}"
+                        style="width:760px;margin: 0 auto;background-color: #fff;overflow: hidden;padding: 30px;padding-top: 0;position: relative;">
                         <table style="width:100%">
                             <tr>
                                 <td style="width: 40%; float: left; padding-top: 15px;">
@@ -71,10 +123,10 @@
                                         <p><strong>Payment Method:</strong> <span
                                                 style="text-transform: uppercase;">{{ $order->payment->payment_method ?? '' }}</span>
                                         </p>
-                                        @if ($order->payment->trx_id)
+                                        @if ($order->payment)
                                             <p>Trx ID : {{ $order->payment->trx_id ?? '' }}</p>
                                         @endif
-                                        @if ($order->payment->sender_number)
+                                        @if ($order->payment)
                                             <p>Sender Number : {{ $order->payment->sender_number ?? '' }}</p>
                                         @endif
                                     </div>
@@ -165,31 +217,31 @@
                                     <col>
                                     <col>
                                 </colgroup>
-                                <tbody style="background:#f1f9f8">
+                                <tbody style="background:transparent;">
                                     <tr>
                                         <td rowspan="6"><?php
                                         echo DNS2D::getBarcodeHTML(url('/') . '/customer/order-track/result?phone=' . ($order->shipping ? $order->shipping->phone : '') . '&invoice_id=' . $order->invoice_id, 'QRCODE', 5, 5);
                                         ?></td>
-                                        <td><strong>SubTotal</strong></td>
+                                        <td><strong>Bill of Goods</strong></td>
                                         {{-- <td><strong>৳{{ $order->amount + $order->discount - $order->shipping_charge }}</strong> --}}
                                         <td><strong>৳{{ $subtotal }}</strong>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Shipping(+)</strong></td>
+                                        <td><strong>Discount(-)</strong></td>
+                                        <td><strong>৳{{ $order->discount }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Delivery Cost(+)</strong></td>
                                         <td><strong>৳{{ $order->shipping_charge }}</strong></td>
                                     </tr>
-                                    <tr >
+                                    <tr>
                                         <td><strong>Final Total</strong></td>
                                         <td><strong>৳{{ $subtotal + $order->shipping_charge }}</strong></td>
                                     </tr>
                                     <tr>
                                         <td><strong>Advance(-)</strong></td>
                                         <td><strong>৳{{ $order->paid }}</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Discount(-)</strong></td>
-                                        <td><strong>৳{{ $order->discount }}</strong></td>
                                     </tr>
                                     <tr style="background:#4DBC60;color:#fff">
                                         <td><strong>Due(-)</strong></td>
@@ -199,13 +251,20 @@
                             </table>
                             <div class="terms-condition"
                                 style="overflow: hidden; width: 100%; text-align: center; padding: 10px 0 0; border-top: 1px solid #ddd;">
-                                <h5 style="font-style: italic;"><a
-                                        href="{{ route('page', ['slug' => 'terms-condition']) }}">Terms & Conditions</a>
-                                </h5>
-                                <p style="text-align: center; font-style: italic; font-size: 15px; margin-top: 0px;">* This
-                                    is a computer generated invoice, does not require any signature.</p>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                                <div style="height: 200px;border: 2px solid #ddd; width: 50%; padding: 10px;">
+                                    <strong style="margin-top: 145px;display: block; text-align: center;">Customer /
+                                        Receiver</strong>
+                                </div>
+                                <div style="height: 200px;border: 2px solid #ddd; width: 50%; padding: 10px;">
+                                    <strong style="margin-top: 145px;display: block; text-align: center;">Authorized
+                                        Signature and Seal</strong>
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

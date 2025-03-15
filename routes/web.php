@@ -41,6 +41,7 @@ use App\Http\Controllers\Admin\NewstickerController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\CouponCodeController;
+use App\Http\Controllers\Admin\PaymentMethodController;
 
 Auth::routes();
 
@@ -60,9 +61,9 @@ Route::get('/migrate', function () {
 Route::group(['namespace' => 'Frontend', 'middleware' => ['ipcheck', 'check_refer']], function () {
     Route::get('/', [FrontendController::class, 'index'])->name('home');
     Route::get('category/{category}', [FrontendController::class, 'category'])->name('category');
-    
+
     Route::get('subcategory/{subcategory}', [FrontendController::class, 'subcategory'])->name('subcategory');
-    
+
     Route::get('products/{slug}', [FrontendController::class, 'products'])->name('products');
     Route::get('review-images', [FrontendController::class, 'reviewimages'])->name('review.images');
     Route::get('brands/{slug}', [FrontendController::class, 'brands'])->name('brands');
@@ -346,6 +347,16 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::post('size/active', [SizeController::class, 'active'])->name('sizes.active');
     Route::post('size/destroy', [SizeController::class, 'destroy'])->name('sizes.destroy');
 
+    // payment method
+    Route::get('payment-method/manage', [PaymentMethodController::class, 'index'])->name('paymentmethods.index');
+    Route::get('payment-method/{id}/show', [PaymentMethodController::class, 'show'])->name('paymentmethods.show');
+    Route::get('payment-method/create', [PaymentMethodController::class, 'create'])->name('paymentmethods.create');
+    Route::post('payment-method/save', [PaymentMethodController::class, 'store'])->name('paymentmethods.store');
+    Route::get('payment-method/{id}/edit', [PaymentMethodController::class, 'edit'])->name('paymentmethods.edit');
+    Route::post('payment-method/update', [PaymentMethodController::class, 'update'])->name('paymentmethods.update');
+    Route::post('payment-method/inactive', [PaymentMethodController::class, 'inactive'])->name('paymentmethods.inactive');
+    Route::post('payment-method/active', [PaymentMethodController::class, 'active'])->name('paymentmethods.active');
+    Route::post('payment-method/destroy', [PaymentMethodController::class, 'destroy'])->name('paymentmethods.destroy');
 
     // product
     Route::get('products/manage', [ProductController::class, 'index'])->name('products.index');
@@ -430,8 +441,6 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::post('banner/active', [BannerController::class, 'active'])->name('banners.active');
     Route::post('banner/destroy', [BannerController::class, 'destroy'])->name('banners.destroy');
 
-
-
     // expensecategories
     Route::get('expensecategories/manage', [ExpenseCategoriesController::class, 'index'])->name('expensecategories.index');
     Route::get('expensecategories/{id}/show', [ExpenseCategoriesController::class, 'show'])->name('expensecategories.show');
@@ -453,8 +462,6 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::post('expense/inactive', [ExpenseController::class, 'inactive'])->name('expense.inactive');
     Route::post('expense/active', [ExpenseController::class, 'active'])->name('expense.active');
     Route::post('expense/destroy', [ExpenseController::class, 'destroy'])->name('expense.destroy');
-
-
 
     // contact route
     Route::get('page/manage', [CreatePageController::class, 'index'])->name('pages.index');
@@ -483,6 +490,8 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::post('order/cart-clear', [OrderController::class, 'cart_clear'])->name('admin.order.cart_clear');
     Route::get('order/paid', [OrderController::class, 'order_paid'])->name('admin.order.paid');
     Route::post('order/customer', [OrderController::class, 'find_customer'])->name('admin.order.customer');
+    Route::post('order/payment-change', [OrderController::class, 'payment_change'])->name('order.payment.change');
+    Route::get('order/payment-remove', [OrderController::class, 'payment_remove'])->name('admin.order.payment_remove');
 
     //pro checker
     Route::get('silip-print', [OrderController::class, 'product_print'])->name('admin.order.product_print');

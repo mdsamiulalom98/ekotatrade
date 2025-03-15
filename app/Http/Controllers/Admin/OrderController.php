@@ -28,6 +28,7 @@ use App\Models\ProductVariable;
 use App\Models\Contact;
 use App\Models\SmsGateway;
 use App\Models\GeneralSetting;
+use App\Models\PaymentMethod;
 
 class OrderController extends Controller
 {
@@ -58,7 +59,6 @@ class OrderController extends Controller
             $products = $products->where('name', 'LIKE', '%' . $request->keyword . "%")->orWhere('pro_barcode', 'LIKE', '%' . $request->keyword . "%");
         }
         $products = $products->get();
-
 
         if (empty($request->keyword)) {
             $products = [];
@@ -182,7 +182,7 @@ class OrderController extends Controller
         $order = Order::where(['id' => $id])->with('orderdetails', 'payment', 'shipping', 'customer')->firstOrFail();
         return view('backEnd.order.invoice', compact('order'));
     }
-    
+
     public function slip($id)
     {
         $order = Order::where(['id' => $id])->with('orderdetails', 'payment', 'shipping')->firstOrFail();
@@ -241,7 +241,7 @@ class OrderController extends Controller
                         CURLOPT_CUSTOMREQUEST => 'POST',
                         CURLOPT_POSTFIELDS => array(
                             'api_key' => "$sms_gateway->api_key",
-                            "msg" => "প্রিয় $request->name \n আপনার অরার #$order->invoice_id টি প্রসেস করা হয়েছে! অরডরটি ট্র্যাক করতে ক্লিক রুন: \n https://www.ekotatrade.com.bd/customer/order-track/result?phone=$request->phone&invoice_id=$order->invoice_id \n একতা ট্রে এর সাথে থাকার ন্য ধন্যবাদ!",
+                            "msg" => "প্রিয় $request->name \n আপনার অর্ডার #$order->invoice_id টি প্রসেস করা হয়েছে! অর্ডারটি ট্র্যাক করতে ক্লিক করুন: \n https://www.ekotatrade.com.bd/customer/order-track/result?phone=$request->phone&invoice_id=$order->invoice_id \n একতা ট্রেডের এর সাথে থাকার জন্য ধন্যবাদ!",
                             'to' => $request->phone
                         ),
                     )
@@ -316,7 +316,7 @@ class OrderController extends Controller
                         CURLOPT_CUSTOMREQUEST => 'POST',
                         CURLOPT_POSTFIELDS => array(
                             'api_key' => "$sms_gateway->api_key",
-                            "msg" => "প্রিয $request->name \n আপনর অর্ার #$order->invoice_id টি ক্যা্সেল করা হযেছে!  বি্তারিত জানে ক্লিক করু: https://www.ekotatrade.com.bd/customer/order-track/result?phone=$request->phone&invoice _id=$order->invoice_id \n একত ট্রেড এর সাে থকার জন্য ধনযবাদ!",
+                            "msg" => "প্রিয় $request->name \n আপনার অর্ডার #$order->invoice_id টি ক্যানসেল করা হয়েছে! বিস্তারিত জানতে ক্লিক করুন: https://www.ekotatrade.com.bd/customer/order-track/result?phone=$request->phone&invoice _id=$order->invoice_id \n একতা ট্রেড এর সাথে থাকার জন্য ধন্যবাদ!",
                             'to' => $request->phone
                         ),
                     )
@@ -326,28 +326,36 @@ class OrderController extends Controller
             }
 
             $linkdata = OrderStatus::find($request->status)->name;
-            if($order->shipping->email) {
+            if ($order->shipping->email) {
                 $data = [
                     'email' => $order->shipping->email,
                     'order_id' => $order->id,
                 ];
-    
-                Mail::send('emails.order_cancel', $data, function ($textmsg) use ($data, $linkdata) {
-                    $textmsg->to($data['email']);
-                    $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-                });
+
+                try {
+                    Mail::send('emails.order_cancel', $data, function ($textmsg) use ($data, $linkdata) {
+                        $textmsg->to($data['email']);
+                        $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                    });
+                } catch (\Exception $e) {
+                    Toastr::error('Email not sent', 'Failed');
+                }
             }
-            
+
 
             $data = [
                 'email' => $this->contact()->hotmail,
                 'order_id' => $order->id,
             ];
 
-            Mail::send('emails.order_cancel', $data, function ($textmsg) use ($data, $linkdata) {
-                $textmsg->to($data['email']);
-                $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-            });
+            try {
+                Mail::send('emails.order_cancel', $data, function ($textmsg) use ($data, $linkdata) {
+                    $textmsg->to($data['email']);
+                    $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                });
+            } catch (\Exception $e) {
+                Toastr::error('Email not sent', 'Failed');
+            }
         }
 
         if ($request->status == 6) {
@@ -373,28 +381,36 @@ class OrderController extends Controller
             }
 
             $linkdata = OrderStatus::find($request->status)->name;
-            if($order->shipping->email) {
+            if ($order->shipping->email) {
                 $data = [
                     'email' => $order->shipping->email,
                     'order_id' => $order->id,
                 ];
-    
-                Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
-                    $textmsg->to($data['email']);
-                    $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-                });
+
+                try {
+                    Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
+                        $textmsg->to($data['email']);
+                        $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                    });
+                } catch (\Exception $e) {
+                    Toastr::error('Email not sent', 'Failed');
+                }
             }
-            
+
 
             $data = [
                 'email' => $this->contact()->hotmail,
                 'order_id' => $order->id,
             ];
 
-            Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
-                $textmsg->to($data['email']);
-                $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-            });
+            try {
+                Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
+                    $textmsg->to($data['email']);
+                    $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                });
+            } catch (\Exception $e) {
+                Toastr::error('Email not sent', 'Failed');
+            }
         }
         Toastr::success('Success', 'Order status change successfully');
         return redirect('admin/order/' . $link);
@@ -497,28 +513,34 @@ class OrderController extends Controller
                 }
 
                 $linkdata = OrderStatus::find($request->order_status)->name;
-                if($order->shipping->email) {
+                if ($order->shipping->email) {
                     $data = [
                         'email' => $order->shipping->email,
                         'order_id' => $order->id,
                     ];
-    
-                    Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
-                        $textmsg->to($data['email']);
-                        $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-                    });
+                    try {
+                        Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
+                            $textmsg->to($data['email']);
+                            $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                        });
+                    } catch (\Exception $e) {
+                        Toastr::error('Email not sent', 'Failed');
+                    }
                 }
-                
+
 
                 $data = [
                     'email' => $this->contact()->hotmail,
                     'order_id' => $order->id,
                 ];
-
-                Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
-                    $textmsg->to($data['email']);
-                    $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-                });
+                try {
+                    Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
+                        $textmsg->to($data['email']);
+                        $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                    });
+                } catch (\Exception $e) {
+                    Toastr::error('Email not sent', 'Failed');
+                }
             }
         }
         if ($request->order_status == 6) {
@@ -554,11 +576,15 @@ class OrderController extends Controller
                         'email' => $order->shipping->email,
                         'order_id' => $order->id,
                     ];
+                    try {
+                        Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
+                            $textmsg->to($data['email']);
+                            $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                        });
+                    } catch (\Exception $e) {
+                        Toastr::error('Email not sent', 'Failed');
+                    }
 
-                    Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
-                        $textmsg->to($data['email']);
-                        $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-                    });
                 }
             }
         }
@@ -632,13 +658,14 @@ class OrderController extends Controller
     }
     public function order_create()
     {
-        Cart::instance('pos_shopping')->destroy();
+        // Cart::instance('pos_shopping')->destroy();
         Session::put('pos_shipping', 0);
         $products = Product::select('id', 'name', 'new_price', 'product_code')->where(['status' => 1])->get();
-        $cartinfo = Cart::instance('pos_shopping')->content();
+        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('rowId');
         $shippingcharge = ShippingCharge::where('status', 1)->get();
+        $paymentmethods = PaymentMethod::where('status', 1)->get();
         Session::forget('cpaid');
-        return view('backEnd.order.create', compact('products', 'cartinfo', 'shippingcharge'));
+        return view('backEnd.order.create', compact('products', 'cartinfo', 'shippingcharge', 'paymentmethods'));
     }
 
     public function order_store(Request $request)
@@ -676,7 +703,7 @@ class OrderController extends Controller
         $subtotal = str_replace(',', '', $subtotal);
         $subtotal = str_replace('.00', '', $subtotal);
         $discount = Session::get('pos_discount') + Session::get('product_discount');
-       
+
         $shippingfee = $request->area ?? 0;
         $shippingarea = 'Pos Area';
 
@@ -705,8 +732,8 @@ class OrderController extends Controller
         $order->invoice_id = str_pad($lastId, 5, '0', STR_PAD_LEFT);
         $order->amount = ($subtotal + $shippingfee) - $discount;
         $order->discount = $discount ?? 0;
-        $order->paid = $request->paid;
-        $order->due = $order->amount - $request->paid;
+        $order->paid = !empty($request->amount) ? array_sum($request->amount) : 0;
+        $order->due = $order->amount - $order->paid;
         $order->shipping_charge = $shippingfee;
         $order->customer_id = $customer_id;
         $order->order_status = 1;
@@ -723,14 +750,21 @@ class OrderController extends Controller
         $shipping->area = $shippingarea;
         $shipping->save();
 
-        // payment data save
-        $payment = new Payment();
-        $payment->order_id = $order->id;
-        $payment->customer_id = $customer_id;
-        $payment->payment_method = 'Cash On Delivery';
-        $payment->amount = $order->amount;
-        $payment->payment_status = 'pending';
-        $payment->save();
+        if ($request->amount) {
+            $amounts = array_filter($request->amount);
+            if (is_array($amounts)) {
+                foreach ($amounts as $key => $amount) {
+                    // payment data save
+                    $payment = new Payment();
+                    $payment->order_id = $order->id;
+                    $payment->customer_id = $customer_id;
+                    $payment->payment_method = $request->payment_method[$key];
+                    $payment->amount = $amount;
+                    $payment->payment_status = 'paid';
+                    $payment->save();
+                }
+            }
+        }
 
         // order details data save
         foreach (Cart::instance('pos_shopping')->content() as $cart) {
@@ -746,6 +780,36 @@ class OrderController extends Controller
             $order_details->sale_price = $cart->price;
             $order_details->qty = $cart->qty;
             $order_details->save();
+        }
+        $orders_details = OrderDetails::select('id', 'order_id', 'product_id', 'qty', 'product_type', 'product_size', 'product_color', 'product_id')->where('order_id', $order->id)->get();
+        foreach ($orders_details as $order_detail) {
+            if ($order_detail->product_type == 1) {
+                $product = Product::find($order_detail->product_id);
+                if ($product->stock >= $order_detail->qty) {
+                    $product->stock -= $order_detail->qty;
+                    $product->save();
+                } else {
+                    Toastr::error('This product stock is not sufficient', 'Failed!');
+                    return redirect()->back();
+                }
+            } else {
+                $product = ProductVariable::where('product_id', $order_detail->product_id);
+                if ($order_detail->product_color) {
+                    $product->where('color', $order_detail->product_color);
+                }
+                if ($order_detail->product_size) {
+                    $product->where('size', $order_detail->product_size);
+                }
+
+                $product = $product->first();
+                if ($product && $product->stock >= $order_detail->qty) {
+                    $product->stock -= $order_detail->qty;
+                    $product->save();
+                } else {
+                    Toastr::error('This product stock is not sufficient', 'Failed!');
+                    return redirect()->back();
+                }
+            }
         }
         Cart::instance('pos_shopping')->destroy();
         Session::forget('pos_shipping');
@@ -815,12 +879,12 @@ class OrderController extends Controller
                 ],
             ]);
         }
-        
+
         return response()->json(compact('cartinfo'));
     }
     public function cart_content()
     {
-        $cartinfo = Cart::instance('pos_shopping')->content();
+        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('rowId');
         return view('backEnd.order.cart_content', compact('cartinfo'));
     }
     public function find_customer(Request $request)
@@ -864,7 +928,7 @@ class OrderController extends Controller
     }
     public function cart_remove(Request $request)
     {
-        $remove = Cart::instance('pos_shopping')->remove($request->id);
+        Cart::instance('pos_shopping')->remove($request->id);
         $cartinfo = Cart::instance('pos_shopping')->content();
         return response()->json($cartinfo);
     }
@@ -879,7 +943,9 @@ class OrderController extends Controller
                 'old_price' => $cart->options->old_price,
                 'purchase_price' => $cart->options->purchase_price,
                 'product_discount' => $cart->options->discount,
-                'details_id' => $cart->options->details_id
+                'details_id' => $cart->options->details_id,
+                'product_size' => $cart->options->product_size,
+                'product_color' => $cart->options->product_color,
             ],
         ]);
         return response()->json($cartinfo);
@@ -895,7 +961,9 @@ class OrderController extends Controller
                 'old_price' => $cart->options->old_price,
                 'purchase_price' => $cart->options->purchase_price,
                 'product_discount' => $discount,
-                'details_id' => $cart->options->details_id
+                'details_id' => $cart->options->details_id,
+                'product_size' => $cart->options->product_size,
+                'product_color' => $cart->options->product_color,
             ],
         ]);
         return response()->json($cartinfo);
@@ -909,7 +977,7 @@ class OrderController extends Controller
 
     public function cart_clear(Request $request)
     {
-        $cartinfo = Cart::instance('pos_shopping')->destroy();
+        Cart::instance('pos_shopping')->destroy();
         Session::forget('pos_shipping');
         Session::forget('pos_discount');
         Session::forget('product_discount');
@@ -917,14 +985,18 @@ class OrderController extends Controller
     }
     public function order_edit($id)
     {
+        Session::forget('cpaid');
         $products = Product::select('id', 'name', 'new_price', 'product_code')->where(['status' => 1])->get();
         $shippingcharge = ShippingCharge::where('status', 1)->get();
         $order = Order::where('id', $id)->first();
         $cartinfo = Cart::instance('pos_shopping')->destroy();
         $shippinginfo = Shipping::where('order_id', $order->id)->first();
+        $paymentmethods = PaymentMethod::where('status', 1)->get();
+        $payments = Payment::where('order_id', $order->id)->get();
+        $paymentAmount = $payments->sum('amount');
+        Session::put('cpaid', $paymentAmount);
         Session::put('product_discount', $order->discount);
         Session::put('pos_shipping', $order->shipping_charge);
-        Session::forget('cpaid');
         $orderdetails = OrderDetails::where('order_id', $order->id)->get();
         foreach ($orderdetails as $ordetails) {
             $cartinfo = Cart::instance('pos_shopping')->add([
@@ -943,7 +1015,7 @@ class OrderController extends Controller
             ]);
         }
         $cartinfo = Cart::instance('pos_shopping')->content();
-        return view('backEnd.order.edit', compact('products', 'cartinfo', 'shippingcharge', 'shippinginfo', 'order'));
+        return view('backEnd.order.edit', compact('products', 'cartinfo', 'shippingcharge', 'shippinginfo', 'order', 'paymentmethods', 'payments'));
     }
 
     public function order_update(Request $request)
@@ -964,7 +1036,7 @@ class OrderController extends Controller
         $subtotal = str_replace(',', '', $subtotal);
         $subtotal = str_replace('.00', '', $subtotal);
         $discount = Session::get('pos_discount') + Session::get('product_discount');
-        
+
         $shippingfee = $request->area ?? 0;
         $shippingarea = 'Pos Area';
 
@@ -988,8 +1060,8 @@ class OrderController extends Controller
         $order = Order::where('id', $request->order_id)->first();
         $order->amount = ($subtotal + $shippingfee) - $discount;
         $order->discount = $discount ?? 0;
-        $order->paid = $request->paid;
-        $order->due = $order->amount - $request->paid;
+        $order->paid = !empty($request->amount) ? array_sum($request->amount) : 0;
+        $order->due = $order->amount - $order->paid;
         $order->shipping_charge = $shippingfee;
         $order->customer_id = $customer_id;
         $order->order_status = 1;
@@ -1007,14 +1079,46 @@ class OrderController extends Controller
         $shipping->area = $shippingarea;
         $shipping->save();
 
-        // payment data save
-        $payment = Payment::where('order_id', $request->order_id)->first();
-        $payment->order_id = $order->id;
-        $payment->customer_id = $customer_id;
-        $payment->payment_method = 'Cash On Delivery';
-        $payment->amount = $order->amount;
-        $payment->payment_status = 'pending';
-        $payment->save();
+        if ($request->up_payment) {
+            $update_payments = array_filter($request->up_payment);
+            $amounts = $request->amount;
+            $payment_methods = $request->payment_method;
+
+            if ($update_payments) {
+                foreach ($update_payments as $key => $update_id) {
+                    $uppayment = Payment::find($update_id);
+                    if ($uppayment) {
+                        $uppayment->customer_id = $customer_id;
+                        $uppayment->payment_method = $payment_methods[$key];
+                        $uppayment->amount = $amounts[$key];
+                        $uppayment->save();
+                    }
+                }
+            }
+        }
+
+        // Insert New Payments Only (Exclude Updated Ones)
+        if ($request->amount) {
+            $amounts = array_filter($request->amount);
+            $payment_methods = $request->payment_method;
+
+            // Exclude already updated payments
+            $updated_payment_keys = array_keys($update_payments ?? []);
+
+            if (is_array($amounts)) {
+                foreach ($amounts as $key => $amount) {
+                    if (!in_array($key, $updated_payment_keys)) { // Prevent duplication
+                        $payment = new Payment();
+                        $payment->order_id = $order->id;
+                        $payment->customer_id = $customer_id;
+                        $payment->payment_method = $payment_methods[$key];
+                        $payment->amount = $amount;
+                        $payment->payment_status = 'paid';
+                        $payment->save();
+                    }
+                }
+            }
+        }
 
         // order details data save
         foreach ($order->orderdetails as $orderdetail) {
@@ -1173,5 +1277,28 @@ class OrderController extends Controller
         $amount = $request->amount ?? 0;
         Session::put('cpaid', $amount);
         return response()->json($amount);
+    }
+    public function payment_change(Request $request)
+    {
+        $order = Order::find($request->order_id);
+        if ($request->status == 'paid') {
+            $order->paid = $order->amount;
+            $order->due = 0;
+        } else {
+            $order->paid = 0;
+            $order->due = $order->amount;
+        }
+        $order->save();
+        return redirect()->back();
+    }
+    public function payment_remove(Request $request)
+    {
+        $payment = Payment::find($request->id);
+        $order = Order::find($payment->order_id);
+        $order->paid = $order->paid - $payment->amount;
+        $order->due = $order->amount - $order->paid;
+        $order->save();
+        $payment->delete();
+        return redirect()->back();
     }
 }

@@ -84,7 +84,8 @@
                                             <img src="{{ asset($porder->customer ? $porder->customer->image : '') }}"
                                                 class="img-fluid rounded-circle" alt="" />
                                         </div>
-                                        <p class="notify-details">{{ $porder->customer ? $porder->customer->name : '' }}
+                                        <p class="notify-details">
+                                            {{ $porder->customer ? $porder->customer->name : '' }}
                                         </p>
                                         <p class="text-muted mb-0 user-msg">
                                             <small>Invoice : {{ $porder->invoice_id }}</small>
@@ -545,6 +546,11 @@
                                     <li>
                                         <a href="{{ route('orderstatus.index') }}"><i data-feather="file-plus"></i>
                                             Order Status</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('paymentmethods.index') }}">
+                                            <i data-feather="file-plus"></i>
+                                            Payment Methods</a>
                                     </li>
                                 </ul>
                             </div>
