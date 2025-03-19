@@ -19,10 +19,7 @@
         }
 
         .payment-success {
-            background-image: url(http://localhost/ekotatrade/public/frontEnd/images/paid.jpg);
-            background-repeat: no-repeat;
-            background-size: 170px 160px;
-            background-position: bottom center;
+
         }
 
         @page {
@@ -92,10 +89,10 @@
                                         <div class="form-group">
                                             <label for="exampleSelect">Payment Status</label>
                                             <select name="status" class="form-control form-select" id="exampleSelect">
-                                                <option value="paid">
+                                                <option value="paid" {{ $order->is_paid == 1 ? 'selected' : '' }}>
                                                     Paid
                                                 </option>
-                                                <option value="unpaid">
+                                                <option value="unpaid" {{ $order->is_paid == 0 ? 'selected' : '' }}>
                                                     Unpaid
                                                 </option>
                                             </select>
@@ -112,28 +109,19 @@
                     </div>
                 </div>
                 <div class="col-sm-12 mt-3">
-                    <div class="invoice-innter {{ $order->due > 0 ? 'payment-due' : 'payment-success' }}"
+                    <div class="invoice-innter {{ $order->is_paid == 0 ? 'payment-due' : 'payment-success' }}"
                         style="width:760px;margin: 0 auto;background-color: #fff;overflow: hidden;padding: 30px;padding-top: 0;position: relative;">
                         <table style="width:100%">
                             <tr>
                                 <td style="width: 40%; float: left; padding-top: 15px;">
                                     <img src="{{ asset($generalsetting->white_logo) }}" width="190px"
                                         style="margin-top:25px !important" alt="">
-                                    <div style="font-size: 14px; color: #222; margin: 10px 0 4px;">
-                                        <p><strong>Payment Method:</strong> <span
-                                                style="text-transform: uppercase;">{{ $order->payment->payment_method ?? '' }}</span>
-                                        </p>
-                                        @if ($order->payment)
-                                            <p>Trx ID : {{ $order->payment->trx_id ?? '' }}</p>
-                                        @endif
-                                        @if ($order->payment)
-                                            <p>Sender Number : {{ $order->payment->sender_number ?? '' }}</p>
-                                        @endif
-                                    </div>
+
                                     <div class="invoice_form">
                                         <p style="font-size:16px;line-height:1.8;color:#222"><strong>Invoice From:</strong>
                                         </p>
-                                        <p style="font-size:16px;line-height:1.8;color:#222">{{ $generalsetting->name }}</p>
+                                        <p style="font-size:16px;line-height:1.8;color:#222">{{ $generalsetting->name }}
+                                        </p>
                                         <p style="font-size:16px;line-height:1.8;color:#222">{{ $contact->phone }}</p>
                                         <p style="font-size:16px;line-height:1.8;color:#222">{{ $contact->email }}</p>
                                         <p style="font-size:16px;line-height:1.8;color:#222">{{ $contact->address }}</p>
@@ -141,7 +129,7 @@
                                 </td>
                                 <td style="width:60%;float: left;">
                                     <div class="invoice-bar"
-                                        style=" background: #4DBC60; transform: skew(38deg); width: 100%; margin-left: 65px; padding: 20px 60px; ">
+                                        style=" background: #4DBC60; transform: skew(38deg); width: 100%; margin-left: 65px; padding: 0px 60px; ">
                                         <p
                                             style="font-size: 30px; color: #fff; transform: skew(-38deg); text-transform: uppercase; text-align: right; font-weight: bold;">
                                             Invoice</p>
@@ -210,7 +198,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <div class="invoice-bottom">
+                        <div class="invoice-bottom" style="position: relative">
                             <table class="table" style="margin-bottom: 0px;">
                                 <colgroup>
                                     <col span="2">
@@ -243,10 +231,15 @@
                                         <td><strong>Advance(-)</strong></td>
                                         <td><strong>৳{{ $order->paid }}</strong></td>
                                     </tr>
+                                    @if ($order->is_paid == 0)
                                     <tr style="background:#4DBC60;color:#fff">
                                         <td><strong>Due(-)</strong></td>
                                         <td><strong>৳{{ $order->due }}</strong></td>
                                     </tr>
+                                    @endif
+                                    @if ($order->is_paid)
+                                    <img style="position: absolute;top: 15%;opacity: .3;height: 130px;left: 29%;z-index: 0;" src="{{ asset('public/frontEnd/images/paid.jpg') }}" alt="">
+                                    @endif
                                 </tbody>
                             </table>
                             <div class="terms-condition"
@@ -254,17 +247,28 @@
                             </div>
 
                             <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                                <div style="height: 200px;border: 2px solid #ddd; width: 50%; padding: 10px;">
-                                    <strong style="margin-top: 145px;display: block; text-align: center;">Customer /
+                                <div
+                                    style="height: 100px;border: 1px solid #ddd;width: 50%;padding: 10px;border-right: none;">
+                                    <strong style="margin-top: 60px;display: block; text-align: center;">Customer /
                                         Receiver</strong>
                                 </div>
-                                <div style="height: 200px;border: 2px solid #ddd; width: 50%; padding: 10px;">
-                                    <strong style="margin-top: 145px;display: block; text-align: center;">Authorized
+                                <div style="height: 100px;border: 1px solid #ddd; width: 50%; padding: 10px;">
+                                    <strong style="margin-top: 60px;display: block; text-align: center;">Authorized
                                         Signature and Seal</strong>
                                 </div>
                             </div>
                         </div>
-
+                        <div style="font-size: 14px; color: #222; margin: 10px 0 4px;">
+                            <p><strong>Payment Method:</strong> <span
+                                    style="text-transform: uppercase;">{{ $order->payment->payment_method ?? '' }}</span>
+                            </p>
+                            @if ($order->payment)
+                                <p>Trx ID : {{ $order->payment->trx_id ?? '' }}</p>
+                            @endif
+                            @if ($order->payment)
+                                <p>Sender Number : {{ $order->payment->sender_number ?? '' }}</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

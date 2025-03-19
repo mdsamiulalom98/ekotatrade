@@ -661,7 +661,7 @@ class OrderController extends Controller
         // Cart::instance('pos_shopping')->destroy();
         Session::put('pos_shipping', 0);
         $products = Product::select('id', 'name', 'new_price', 'product_code')->where(['status' => 1])->get();
-        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('rowId');
+        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('options.sort_order');
         $shippingcharge = ShippingCharge::where('status', 1)->get();
         $paymentmethods = PaymentMethod::where('status', 1)->get();
         Session::forget('cpaid');
@@ -707,8 +707,12 @@ class OrderController extends Controller
         $shippingfee = $request->area ?? 0;
         $shippingarea = 'Pos Area';
 
-        $exits_customer = Customer::where('phone', $phone)->select('phone', 'id')->first();
+        $exits_customer = Customer::where('phone', $phone)->select('phone', 'id', 'address')->first();
         if ($exits_customer) {
+            if (empty($exits_customer->address)) {
+                $exits_customer->address = $request->address;
+                $exits_customer->save();
+            }
             $customer_id = $exits_customer->id;
         } else {
             $password = rand(111111, 999999);
@@ -716,6 +720,7 @@ class OrderController extends Controller
             $store->name = $name;
             $store->slug = $name;
             $store->phone = $phone;
+            $store->address = $address;
             $store->password = bcrypt($password);
             $store->verify = 1;
             $store->status = 'active';
@@ -752,6 +757,8 @@ class OrderController extends Controller
 
         if ($request->amount) {
             $amounts = array_filter($request->amount);
+            $trx_ids = $request->trx_id;
+            $sender_numbers = $request->sender_number;
             if (is_array($amounts)) {
                 foreach ($amounts as $key => $amount) {
                     // payment data save
@@ -760,6 +767,8 @@ class OrderController extends Controller
                     $payment->customer_id = $customer_id;
                     $payment->payment_method = $request->payment_method[$key];
                     $payment->amount = $amount;
+                    $payment->trx_id = $trx_ids[$key];
+                    $payment->sender_number = $sender_numbers[$key];
                     $payment->payment_status = 'paid';
                     $payment->save();
                 }
@@ -846,6 +855,7 @@ class OrderController extends Controller
         $qty = 1;
         $itemIdentifier = $product->id . '-' . ($var_product->color ?? '') . '-' . ($var_product->size ?? '');
         $cartitem = Cart::instance('pos_shopping')->content()->where('id', $itemIdentifier)->first();
+        $cart_count = Cart::instance('pos_shopping')->content()->count();
         if ($cartitem) {
             $cart_qty = $cartitem->qty + $qty;
 
@@ -876,6 +886,7 @@ class OrderController extends Controller
                     'product_type' => $product->product_type,
                     'product_color' => $var_product->color ?? null,
                     'product_size' => $var_product->size ?? null,
+                    'sort_order' => $cart_count + 1
                 ],
             ]);
         }
@@ -884,7 +895,7 @@ class OrderController extends Controller
     }
     public function cart_content()
     {
-        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('rowId');
+        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('options.sort_order');
         return view('backEnd.order.cart_content', compact('cartinfo'));
     }
     public function find_customer(Request $request)
@@ -898,7 +909,7 @@ class OrderController extends Controller
     }
     public function cart_details()
     {
-        $cartinfo = Cart::instance('pos_shopping')->content();
+        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('options.sort_order');
         $discount = 0;
         foreach ($cartinfo as $cart) {
             $discount += $cart->options->product_discount * $cart->qty;
@@ -929,7 +940,7 @@ class OrderController extends Controller
     public function cart_remove(Request $request)
     {
         Cart::instance('pos_shopping')->remove($request->id);
-        $cartinfo = Cart::instance('pos_shopping')->content();
+        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('options.sort_order');
         return response()->json($cartinfo);
     }
     public function product_price(Request $request)
@@ -942,10 +953,11 @@ class OrderController extends Controller
                 'image' => $cart->options->image,
                 'old_price' => $cart->options->old_price,
                 'purchase_price' => $cart->options->purchase_price,
-                'product_discount' => $cart->options->discount,
+                'product_discount' => $cart->options->product_discount,
                 'details_id' => $cart->options->details_id,
                 'product_size' => $cart->options->product_size,
                 'product_color' => $cart->options->product_color,
+                'sort_order' => $cart->options->sort_order
             ],
         ]);
         return response()->json($cartinfo);
@@ -964,6 +976,7 @@ class OrderController extends Controller
                 'details_id' => $cart->options->details_id,
                 'product_size' => $cart->options->product_size,
                 'product_color' => $cart->options->product_color,
+                'sort_order' => $cart->options->sort_order
             ],
         ]);
         return response()->json($cartinfo);
@@ -998,7 +1011,7 @@ class OrderController extends Controller
         Session::put('product_discount', $order->discount);
         Session::put('pos_shipping', $order->shipping_charge);
         $orderdetails = OrderDetails::where('order_id', $order->id)->get();
-        foreach ($orderdetails as $ordetails) {
+        foreach ($orderdetails as $key => $ordetails) {
             $cartinfo = Cart::instance('pos_shopping')->add([
                 'id' => $ordetails->product_id,
                 'name' => $ordetails->product_name,
@@ -1011,10 +1024,11 @@ class OrderController extends Controller
                     'product_size' => $ordetails->product_size,
                     'product_color' => $ordetails->product_color,
                     'details_id' => $ordetails->id,
+                    'sort_order' => $key + 1
                 ],
             ]);
         }
-        $cartinfo = Cart::instance('pos_shopping')->content();
+        $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('options.sort_order');
         return view('backEnd.order.edit', compact('products', 'cartinfo', 'shippingcharge', 'shippinginfo', 'order', 'paymentmethods', 'payments'));
     }
 
@@ -1040,8 +1054,12 @@ class OrderController extends Controller
         $shippingfee = $request->area ?? 0;
         $shippingarea = 'Pos Area';
 
-        $exits_customer = Customer::where('phone', $request->phone)->select('phone', 'id')->first();
+        $exits_customer = Customer::where('phone', $request->phone)->select('phone', 'id', 'address')->first();
         if ($exits_customer) {
+            if (empty($exits_customer->address)) {
+                $exits_customer->address = $request->address;
+                $exits_customer->save();
+            }
             $customer_id = $exits_customer->id;
         } else {
             $password = rand(111111, 999999);
@@ -1049,6 +1067,7 @@ class OrderController extends Controller
             $store->name = $request->name;
             $store->slug = $request->name;
             $store->phone = $request->phone;
+            $store->address = $request->address;
             $store->password = bcrypt($password);
             $store->verify = 1;
             $store->status = 'active';
@@ -1068,7 +1087,6 @@ class OrderController extends Controller
         $order->note = $request->note;
         $order->save();
 
-
         // shipping data save
         $shipping = Shipping::where('order_id', $request->order_id)->first();
         $shipping->order_id = $order->id;
@@ -1083,6 +1101,8 @@ class OrderController extends Controller
             $update_payments = array_filter($request->up_payment);
             $amounts = $request->amount;
             $payment_methods = $request->payment_method;
+            $trx_ids = $request->trx_id;
+            $sender_numbers = $request->sender_number;
 
             if ($update_payments) {
                 foreach ($update_payments as $key => $update_id) {
@@ -1091,6 +1111,8 @@ class OrderController extends Controller
                         $uppayment->customer_id = $customer_id;
                         $uppayment->payment_method = $payment_methods[$key];
                         $uppayment->amount = $amounts[$key];
+                        $uppayment->trx_id = $trx_ids[$key];
+                        $uppayment->sender_number = $sender_numbers[$key];
                         $uppayment->save();
                     }
                 }
@@ -1101,6 +1123,8 @@ class OrderController extends Controller
         if ($request->amount) {
             $amounts = array_filter($request->amount);
             $payment_methods = $request->payment_method;
+            $trx_ids = $request->trx_id;
+            $sender_numbers = $request->sender_number;
 
             // Exclude already updated payments
             $updated_payment_keys = array_keys($update_payments ?? []);
@@ -1113,6 +1137,8 @@ class OrderController extends Controller
                         $payment->customer_id = $customer_id;
                         $payment->payment_method = $payment_methods[$key];
                         $payment->amount = $amount;
+                        $payment->trx_id = $trx_ids[$key];
+                        $payment->sender_number = $sender_numbers[$key];
                         $payment->payment_status = 'paid';
                         $payment->save();
                     }
@@ -1282,11 +1308,9 @@ class OrderController extends Controller
     {
         $order = Order::find($request->order_id);
         if ($request->status == 'paid') {
-            $order->paid = $order->amount;
-            $order->due = 0;
+            $order->is_paid = 1;
         } else {
-            $order->paid = 0;
-            $order->due = $order->amount;
+            $order->is_paid = 0;
         }
         $order->save();
         return redirect()->back();

@@ -178,110 +178,6 @@
                                         </div>
                                     </div>
                                     <!-- col-end -->
-
-                                    <div class="col-sm-12 mb-3">
-                                        <label for="payment_method">Payment Methods</label>
-                                        <div class="" style="">
-                                            @foreach ($payments as $key => $payment)
-                                                <input type="hidden" value="{{ $payment->id }}" name="up_payment[]">
-                                                <div class="control-group input-group justify-content-between">
-                                                    <div class="row col-11">
-                                                        <div class="col-sm-6">
-                                                            <div class="form-group mb-3">
-                                                                <select name="payment_method[]"
-                                                                    class="form-control form-select">
-                                                                    <option value="">Select Payment Method</option>
-                                                                    @foreach ($paymentmethods as $paymentmethod)
-                                                                        <option value="{{ $paymentmethod->name }}"
-                                                                            {{ $paymentmethod->name == $payment->payment_method ? 'selected' : '' }}>
-                                                                            {{ $paymentmethod->name }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <!-- col-end -->
-                                                        <div class="col-sm-6">
-                                                            <div class="form-group">
-                                                                <input type="number" name="amount[]"
-                                                                    value="{{ $payment->amount }}"
-                                                                    class="form-control payment_amount"
-                                                                    placeholder="Amount">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="input-group-btn">
-                                                        <a class="btn btn-danger"
-                                                            href="{{ route('admin.order.payment_remove', ['id' => $payment->id]) }}">
-                                                            <i class="fa fa-times"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-
-                                        <div class="clone hide" style="display: none;">
-                                            <div class="control-group input-group justify-content-between">
-                                                <div class="row col-11">
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group mb-3">
-                                                            <select name="payment_method[]"
-                                                                class="form-control form-select">
-                                                                <option value="">Select Payment Method</option>
-                                                                @foreach ($paymentmethods as $paymentmethod)
-                                                                    <option value="{{ $paymentmethod->name }}">
-                                                                        {{ $paymentmethod->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <!-- col-end -->
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <input type="number" name="amount[]"
-                                                                class="form-control payment_amount" placeholder="Amount">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="input-group-btn">
-                                                    <button class="btn btn-danger btn-danger" type="button"><i
-                                                            class="fa fa-trash"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="input-group control-group increment justify-content-between">
-                                            <div class="row col-11">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group mb-3">
-                                                        <select name="payment_method[]" class="form-control form-select">
-                                                            <option value="">Select Payment Method</option>
-                                                            @foreach ($paymentmethods as $paymentmethod)
-                                                                <option value="{{ $paymentmethod->name }}">
-                                                                    {{ $paymentmethod->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <!-- col-end -->
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <input type="number" name="amount[]"
-                                                            class="form-control payment_amount" placeholder="Amount">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-success btn-increment" type="button"><i
-                                                        class="fa fa-plus"></i></button>
-                                            </div>
-                                            @error('banner')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <!-- col-end -->
                                 </div>
                             </div>
                             <!-- cart total -->
@@ -313,12 +209,163 @@
                                             <td>{{ $paid }}</td>
                                         </tr>
                                         <tr>
-                                            <td>Total</td>
+                                            <td>Due</td>
                                             <td>{{ $subtotal + $shipping - ($total_discount + $paid) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="col-sm-12 mb-3">
+                                <label for="payment_method">Payment Methods</label>
+                                <div class="" style="">
+                                    @foreach ($payments as $key => $payment)
+                                        <input type="hidden" value="{{ $payment->id }}" name="up_payment[]">
+                                        <div class="control-group input-group justify-content-between">
+                                            <div class="row col-11">
+                                                <div class="col-sm-3">
+                                                    <div class="form-group mb-3">
+                                                        <select name="payment_method[]"
+                                                            class="form-control form-select">
+                                                            <option value="">Select Payment Method</option>
+                                                            @foreach ($paymentmethods as $paymentmethod)
+                                                                <option value="{{ $paymentmethod->name }}"
+                                                                    {{ $paymentmethod->name == $payment->payment_method ? 'selected' : '' }}>
+                                                                    {{ $paymentmethod->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <!-- col-end -->
+                                                <div class="col-sm-3">
+                                                    <div class="form-group">
+                                                        <input type="number" name="amount[]"
+                                                            value="{{ $payment->amount }}"
+                                                            class="form-control payment_amount"
+                                                            placeholder="Amount">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="form-group">
+                                                        <input type="text" name="trx_id[]"
+                                                            value="{{ $payment->trx_id }}"
+                                                            class="form-control "
+                                                            placeholder="Trx ID">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <div class="form-group">
+                                                        <input type="text" name="sender_number[]"
+                                                            value="{{ $payment->sender_number }}"
+                                                            class="form-control"
+                                                            placeholder="Sender Number">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="input-group-btn">
+                                                <a class="btn btn-danger"
+                                                    href="{{ route('admin.order.payment_remove', ['id' => $payment->id]) }}">
+                                                    <i class="fa fa-times"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <div class="clone hide" style="display: none;">
+                                    <div class="control-group input-group justify-content-between">
+                                        <div class="row col-11">
+                                            <div class="col-sm-3">
+                                                <div class="form-group mb-3">
+                                                    <select name="payment_method[]"
+                                                        class="form-control form-select">
+                                                        <option value="">Select Payment Method</option>
+                                                        @foreach ($paymentmethods as $paymentmethod)
+                                                            <option value="{{ $paymentmethod->name }}">
+                                                                {{ $paymentmethod->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- col-end -->
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <input type="number" name="amount[]"
+                                                        class="form-control payment_amount" placeholder="Amount">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <input type="text" name="trx_id[]"
+                                                        value="{{ old('trx_id') }}"
+                                                        class="form-control "
+                                                        placeholder="Trx ID">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <input type="text" name="sender_number[]"
+                                                        value="{{ old('sender_number') }}"
+                                                        class="form-control"
+                                                        placeholder="Sender Number">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-danger btn-danger" type="button"><i
+                                                    class="fa fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="input-group control-group increment justify-content-between">
+                                    <div class="row col-11">
+                                        <div class="col-sm-3">
+                                            <div class="form-group mb-3">
+                                                <select name="payment_method[]" class="form-control form-select">
+                                                    <option value="">Select Payment Method</option>
+                                                    @foreach ($paymentmethods as $paymentmethod)
+                                                        <option value="{{ $paymentmethod->name }}">
+                                                            {{ $paymentmethod->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- col-end -->
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <input type="number" name="amount[]"
+                                                    class="form-control payment_amount" placeholder="Amount">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <input type="text" name="trx_id[]"
+                                                    value="{{ old('trx_id') }}"
+                                                    class="form-control "
+                                                    placeholder="Trx ID">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <input type="text" name="sender_number[]"
+                                                    value="{{ old('sender_number') }}"
+                                                    class="form-control"
+                                                    placeholder="Sender Number">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-success btn-increment" type="button"><i
+                                                class="fa fa-plus"></i></button>
+                                    </div>
+                                    @error('banner')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <!-- col-end -->
                             <div>
                                 <input type="submit" class="btn btn-success" value="Update Order" />
                             </div>
@@ -463,26 +510,7 @@
                 });
             }
         });
-        $(document).on("input", ".quantity_update", function(e) {
-            e.preventDefault();
-            var id = $(this).data("id");
-            var qty = $(this).val();
-            if (id) {
-                $.ajax({
-                    cache: false,
-                    type: "GET",
-                    data: {
-                        id: id,
-                        qty: qty
-                    },
-                    url: "{{ route('admin.order.quantity_update') }}",
-                    dataType: "json",
-                    success: function(cartinfo) {
-                        return cart_content() + cart_details();
-                    },
-                });
-            }
-        });
+
         // Prevent form submission on Enter key press in quantity_update input
         $(document).on("keypress", ".quantity_update", function(e) {
             if (e.which === 13) {
@@ -567,22 +595,9 @@
 
         $(document).on("input", ".product_price", debouncedProductPrice);
 
-        $(".cartclear").click(function(e) {
-            $.ajax({
-                cache: false,
-                type: "GET",
-                url: "{{ route('admin.order.cart_clear') }}",
-                dataType: "json",
-                success: function(cartinfo) {
-                    return cart_content() + cart_details();
-                },
-                error: function() {
-                    alert('Error occurred while clearing cart');
-                }
-            });
-        }); // pshippingfee from total
-        $("#area").on("change", function() {
-            var area = $(this).val();
+        const debouncedShippingAmount = debounce(function(e) {
+            e.preventDefault();
+            var area = $('#area').val();
             $.ajax({
                 type: "GET",
                 data: {
@@ -597,7 +612,79 @@
                     alert('Error occurred while updating shipping fee');
                 }
             });
+        }, 500);
+
+        $(document).on("input", "#area", debouncedShippingAmount);
+
+        const debouncedUpdatedQuantity = debounce(function(e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            var qty = $(this).val();
+            if (id) {
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    data: {
+                        id: id,
+                        qty: qty
+                    },
+                    url: "{{ route('admin.order.quantity_update') }}",
+                    dataType: "json",
+                    success: function(cartinfo) {
+                        return cart_content() + cart_details();
+                    },
+                });
+            }
+        }, 1500);
+
+        $(document).on("input", ".quantity_update", debouncedUpdatedQuantity);
+
+        // customer details
+        const debouncedCustomerPhone = debounce(function(e) {
+            e.preventDefault();
+            console.log('working');
+            var phoneNumber = $('#phone').val();
+            if (phoneNumber.length === 11) {
+                $.ajax({
+                    url: "{{ route('admin.order.customer') }}",
+                    type: 'POST',
+                    dataType: "json",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        phone: phoneNumber
+                    },
+                    success: function(response) {
+                        if (response.status == 'success') {
+                            $('#name').val(response.customer.name);
+                            $('#address').val(response.customer.address);
+                        }
+                    },
+                    error: function() {
+                        alert('Error occurred while fetching the response');
+                    }
+                });
+                console.log('working');
+            }
+        },1000);
+
+        $(document).on('input', '#phone', debouncedCustomerPhone);
+
+        $(".cartclear").click(function(e) {
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "{{ route('admin.order.cart_clear') }}",
+                dataType: "json",
+                success: function(cartinfo) {
+                    return cart_content() + cart_details();
+                },
+                error: function() {
+                    alert('Error occurred while clearing cart');
+                }
+            });
         });
+        // pshippingfee from total
+
         $(document).ready(function() {
             $('.search_click').focus();
         });
@@ -617,37 +704,7 @@
             });
         });
     </script>
-    <script>
-        $(document).ready(function() {
-            $('#phone').on('keypress', function(event) {
-                // Check if the key pressed is the "Enter" key (key code 13)
-                if (event.which === 13) {
-                    event.preventDefault();
-                    var phoneNumber = $(this).val();
-                    $.ajax({
-                        url: "{{ route('admin.order.customer') }}",
-                        type: 'POST',
-                        dataType: "json",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            phone: phoneNumber
-                        },
-                        success: function(response) {
-                            if (response.status == 'success') {
-                                $('#name').val(response.customer.name);
-                                $('#address').val(response.customer.address);
-                            }
-                        },
-                        error: function() {
-                            // Handle error if needed
-                            alert('Error occurred while fetching the response');
-                        }
-                    });
-                    console.log('working');
-                }
-            });
-        });
-    </script>
+
     <script type="text/javascript">
         $(document).ready(function() {
             $(".btn-increment").click(function() {

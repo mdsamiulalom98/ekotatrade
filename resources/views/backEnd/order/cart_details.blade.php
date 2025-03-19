@@ -23,6 +23,6 @@
     <td>{{ $paid }}</td>
 </tr>
 <tr>
-    <td>Total</td>
+    <td>Due</td>
     <td>{{ $subtotal + $shipping - ($total_discount + $paid) }}</td>
 </tr>
