@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\OrderNote;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
@@ -41,6 +42,7 @@ class OrderController extends Controller
         $this->middleware('permission:order-invoice', ['only' => ['invoice']]);
         $this->middleware('permission:order-process', ['only' => ['process', 'order_process']]);
         $this->middleware('permission:order-process', ['only' => ['process']]);
+        $this->middleware('permission:order-view', ['only' => ['invoice']]);
     }
     private function contact()
     {
@@ -241,11 +243,12 @@ class OrderController extends Controller
                         CURLOPT_CUSTOMREQUEST => 'POST',
                         CURLOPT_POSTFIELDS => array(
                             'api_key' => "$sms_gateway->api_key",
-                            "msg" => "প্রিয় $request->name \n আপনার অর্ডার #$order->invoice_id টি প্রসেস করা হয়েছে! অর্ডারটি ট্র্যাক করতে ক্লিক করুন: \n https://www.ekotatrade.com.bd/customer/order-track/result?phone=$request->phone&invoice_id=$order->invoice_id \n একতা ট্রেডের এর সাথে থাকার জন্য ধন্যবাদ!",
+                            "msg" => "আপনার অর্ডারটি প্রক্রিয়াকরণে রয়েছে। এখনই ট্র্যাক করুন: \n https://www.ekotatrade.com.bd/customer/order-track/result?phone=$request->phone&invoice_id=$order->invoice_id \n Ekota Trade-এর সাথে থাকার জন্য ধন্যবাদ।",
                             'to' => $request->phone
                         ),
                     )
                 );
+
                 $response = curl_exec($curl);
                 curl_close($curl);
             }
@@ -371,7 +374,7 @@ class OrderController extends Controller
                         CURLOPT_CUSTOMREQUEST => 'POST',
                         CURLOPT_POSTFIELDS => array(
                             'api_key' => "$sms_gateway->api_key",
-                            "msg" => "প্রিয় $request->name \n আপনার অ্ডার #$order->invoice_id ফল ভাবে ডেলভারি করা হযেছে! প্রোডা্ট সম্পর্কে আপনার মুল্যবা মতামত দিতে ক্লিক করুন: https://www.ekotatrade.com.bd/product/$slug#writeReview \n একা ট্রেড এর সাথে থাকার জন্য ধন্যবাদ!",
+                            "msg" => "আপনার অর্ডারটি সফলভাবে ডেলিভারি দেওয়া হয়েছে। আশা করি আপনি পণ্যটি ভালো পেয়েছেন। ছোট্ট একটা রিভিউ আমাদের অনেক সাহায্য করবে 🙂 \n রিভিউ দিন: https://www.ekotatrade.com.bd/product/$slug#writeReview \n Ekota Trade-এর পক্ষ থেকে শুভেচ্ছা ও ধন্যবাদ!",
                             'to' => $request->phone
                         ),
                     )
@@ -452,7 +455,7 @@ class OrderController extends Controller
                             CURLOPT_CUSTOMREQUEST => 'POST',
                             CURLOPT_POSTFIELDS => array(
                                 'api_key' => "$sms_gateway->api_key",
-                                "msg" => "প্রিয $customer \n আপনার র্ডর #$order->invoice_id টি প্রসেস করা হয়েছে! র্ডারটি ট্র্যাক করতে ক্লিক করুন:\n https://www.ekotatrade.com.bd/customer/order-track/result?phone=$phone&invoice_id=$order->invoice_id\n একতা ্রেড র সাথে াকা জন্য ধনযবদ!",
+                                "msg" => "আপনার অর্ডারটি প্রক্রিয়াকরণে রয়েছে। এখনই ট্র্যাক করুন: \n https://www.ekotatrade.com.bd/customer/order-track/result?phone=$phone&invoice_id=$order->invoice_id \n Ekota Trade-এর সাথে থাকার জন্য ধন্যবাদ।",
                                 'to' => $phone,
                             ),
                         )
@@ -491,46 +494,31 @@ class OrderController extends Controller
                 }
 
                 $sms_gateway = SmsGateway::where('status', 1)->first();
-                if ($sms_gateway) {
+                if ($sms_gateway)
                     $phone = $order->shipping->phone ?? '01611814504';
-                    $customer = $order->shipping->name ?? 'estiak';
-                    $curl = curl_init();
-                    curl_setopt_array(
-                        $curl,
-                        array(
-                            CURLOPT_URL => "$sms_gateway->url",
-                            CURLOPT_RETURNTRANSFER => true,
-                            CURLOPT_CUSTOMREQUEST => 'POST',
-                            CURLOPT_POSTFIELDS => array(
-                                'api_key' => "$sms_gateway->api_key",
-                                "msg" => "প্রিয় $customer \n আপনার অ্ডার #$order->invoice_id ট ক্যান্সে রা হয়েছে!  িস্তারিত জাতে ক্লিক করন: https://www.ekotatrade.com.bd/customer/order-track/result?phone=$phone&invoice_id=$order->invoice_id \n একতা টরেড এর সাথে থাার জন্য ধন্বাদ!",
-                                'to' => $phone,
-                            ),
-                        )
-                    );
-                    $response = curl_exec($curl);
-                    curl_close($curl);
-                }
+                $customer = $order->shipping->name ?? 'estiak';
+                $curl = curl_init();
+                curl_setopt_array(
+                    $curl,
+                    array(
+                        CURLOPT_URL => "$sms_gateway->url",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => array(
+                            'api_key' => "$sms_gateway->api_key",
+                            "msg" => "প্রিয় $customer \n আপনার অ্ডার #$order->invoice_id ট ক্যান্সে রা হয়েছে!  িস্তারিত জাতে ক্লিক করন: https://www.ekotatrade.com.bd/customer/order-track/result?phone=$phone&invoice_id=$order->invoice_id \n একতা টরেড এর সাথে থাার জন্য ধন্বাদ!",
+                            'to' => $phone,
+                        ),
+                    )
+                );
+                $response = curl_exec($curl);
+                curl_close($curl);
+            }
 
-                $linkdata = OrderStatus::find($request->order_status)->name;
-                if ($order->shipping->email) {
-                    $data = [
-                        'email' => $order->shipping->email,
-                        'order_id' => $order->id,
-                    ];
-                    try {
-                        Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
-                            $textmsg->to($data['email']);
-                            $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
-                        });
-                    } catch (\Exception $e) {
-                        Toastr::error('Email not sent', 'Failed');
-                    }
-                }
-
-
+            $linkdata = OrderStatus::find($request->order_status)->name;
+            if ($order->shipping->email) {
                 $data = [
-                    'email' => $this->contact()->hotmail,
+                    'email' => $order->shipping->email,
                     'order_id' => $order->id,
                 ];
                 try {
@@ -542,7 +530,21 @@ class OrderController extends Controller
                     Toastr::error('Email not sent', 'Failed');
                 }
             }
+
+            $data = [
+                'email' => $this->contact()->hotmail,
+                'order_id' => $order->id,
+            ];
+            try {
+                Mail::send('emails.order_place', $data, function ($textmsg) use ($data, $linkdata) {
+                    $textmsg->to($data['email']);
+                    $textmsg->subject('Your order is ' . $linkdata . ' on Ekota Trade');
+                });
+            } catch (\Exception $e) {
+                Toastr::error('Email not sent', 'Failed');
+            }
         }
+
         if ($request->order_status == 6) {
             $orders = Order::whereIn('id', $request->input('order_ids'))->get();
             foreach ($orders as $order) {
@@ -560,7 +562,7 @@ class OrderController extends Controller
                             CURLOPT_CUSTOMREQUEST => 'POST',
                             CURLOPT_POSTFIELDS => array(
                                 'api_key' => "$sms_gateway->api_key",
-                                "msg" => "পরিয় $customer \n আনার র্ডার #$order->invoice_id সফল ভাবে ডলিভার করা হ়েছে! প্রোডক্ট সম্পর্ে আপনর মুল্বান তামত দিে কলিক করুন: https://www.ekotatrade.com.bd/product/$slug#writeReview \n এত ট্রেড এর সে থাকার জন্ ধন্যবাদ!",
+                                "msg" => "আপনার অর্ডারটি সফলভাবে ডেলিভারি দেওয়া হয়েছে। আশা করি আপনি পণ্যটি ভালো পেয়েছেন। ছোট্ট একটা রিভিউ আমাদের অনেক সাহায্য করবে 🙂 \n রিভিউ দিন: https://www.ekotatrade.com.bd/product/$slug#writeReview \n Ekota Trade-এর পক্ষ থেকে শুভেচ্ছা ও ধন্যবাদ!",
                                 'to' => $phone
                             ),
                         )
@@ -645,13 +647,11 @@ class OrderController extends Controller
                         $status = 'success';
                         $order->order_status = 5;
                         $order->courier_tracker = $responseData['consignment']['consignment_id'];
-                        ;
                         $order->save();
                     } else {
                         $message = 'Your order place to courier failed';
                         $status = 'failed';
                     }
-                    return response()->json(['status' => $status, 'message' => $message]);
                 }
             }
         }
@@ -820,6 +820,30 @@ class OrderController extends Controller
                 }
             }
         }
+
+        $sms_gateway = SmsGateway::where('status', 1)->first();
+        if ($sms_gateway) {
+            $phone = $order->shipping->phone ?? '01611814504';
+            $customer = $order->shipping->name ?? 'estiak';
+            $slug = $order->orderdetail->product->slug;
+            $curl = curl_init();
+            curl_setopt_array(
+                $curl,
+                array(
+                    CURLOPT_URL => "$sms_gateway->url",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => array(
+                        'api_key' => "$sms_gateway->api_key",
+                        "msg" => "আপনার অর্ডারটি নিশ্চিত করা হয়েছে। ইনভয়েস দেখতে নিচের লিংকটি ভিজিট করুন: \n https://www.ekotatrade.com.bd/customer/invoice?$order->id \n Ekota Trade-এর সাথে থাকার জন্য ধন্যবাদ।",
+                        'to' => $phone
+                    ),
+                )
+            );
+            $response = curl_exec($curl);
+            curl_close($curl);
+        }
+
         Cart::instance('pos_shopping')->destroy();
         Session::forget('pos_shipping');
         Session::forget('pos_discount');
@@ -1323,6 +1347,16 @@ class OrderController extends Controller
         $order->due = $order->amount - $order->paid;
         $order->save();
         $payment->delete();
+        return redirect()->back();
+    }
+
+    public function order_note_create()
+    {
+        $order_note = new OrderNote();
+        $order_note->order_id = request('order_id');
+        $order_note->note = request('order_note');
+        $order_note->save();
+        Toastr::success('Note updated successfully', 'Success!');
         return redirect()->back();
     }
 }

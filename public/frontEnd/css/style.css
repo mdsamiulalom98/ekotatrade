@@ -4,6 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Manrope:wght@200..800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
 body {
     font-family: "Jost", sans-serif;
     font-size: 14px;
@@ -112,10 +113,12 @@ button {
     padding: 0;
     border: 0;
 }
+
 .button-clicked {
     position: relative;
     overflow: hidden;
 }
+
 .button-clicked::after {
     content: "";
     position: absolute;
@@ -125,20 +128,23 @@ button {
     top: 0;
     left: 0;
     z-index: -1;
-    animation: fillBackground 0.5s forwards
-        cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    animation: fillBackground 0.5s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
+
 @keyframes fillBackground {
     0% {
         width: 0;
     }
+
     100% {
         width: 100%;
     }
 }
+
 .btn-theme {
     background-color: var(--brand-color) !important;
 }
+
 h1,
 h2,
 h3,
@@ -809,7 +815,7 @@ li.Newsletter i {
     text-align: left;
 }
 
-.categories ul li:hover > .sub-category {
+.categories ul li:hover>.sub-category {
     visibility: visible;
     opacity: 1;
 }
@@ -1369,6 +1375,7 @@ section.slider-section {
     background-image: initial;
     cursor: no-drop;
 }
+
 .order_now_btn {
     font-size: 18px;
     color: #fff;
@@ -1411,6 +1418,7 @@ section.slider-section {
     background-color: #dfdfdf;
     cursor: no-drop;
 }
+
 .call_now_btn {
     height: 45px;
     display: flex;
@@ -1588,6 +1596,7 @@ section.slider-section {
     background: var(--brand-color);
     cursor: pointer;
 }
+
 .variable_product {
     display: flex;
     align-items: center;
@@ -1597,6 +1606,7 @@ section.slider-section {
     border-radius: 10px;
     box-shadow: 1px 1px 1px #ddd;
 }
+
 .increment_control {
     display: flex;
     align-items: center;
@@ -1607,9 +1617,11 @@ section.slider-section {
     box-shadow: 1px 1px 1px #ddd;
     margin-top: 10px;
 }
+
 .review-item {
     display: flex;
 }
+
 .review-image-item {
     width: 60px;
     height: 60px;
@@ -1619,11 +1631,13 @@ section.slider-section {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .review-image-item img {
     object-fit: cover;
     width: 100%;
     height: 100%;
 }
+
 .review-card {
     background: #f1f1f1;
     padding: 15px;
@@ -1632,6 +1646,7 @@ section.slider-section {
     margin: 10px 0;
     width: 100%;
 }
+
 .review-image {
     margin-right: 7px;
     display: flex;
@@ -1661,6 +1676,7 @@ section.slider-section {
     border-radius: 50%;
     color: var(--brand-color);
 }
+
 p.review_content {
     color: #000;
     font-weight: 600;
@@ -1685,7 +1701,7 @@ p.empty-text {
     text-align: left;
 }
 
-.rating > label {
+.rating>label {
     display: inline-block;
     position: relative;
     width: 28px;
@@ -1735,6 +1751,7 @@ textarea#message-text {
 .review-analytics .left .box .stars i {
     color: goldenrod;
 }
+
 .review-analytics .right {
     width: 50%;
 }
@@ -1773,10 +1790,10 @@ textarea#message-text {
     background-color: #daa520;
 }
 
-.rating > label.active:before,
-.rating > label.active ~ label:before,
-.rating > label:hover:before,
-.rating > label:hover ~ label:before {
+.rating>label.active:before,
+.rating>label.active~label:before,
+.rating>label:hover:before,
+.rating>label:hover~label:before {
     content: "\2605";
     position: absolute;
     color: #009e60;
@@ -2551,6 +2568,11 @@ li.recent_pro {
     background: var(--brand-color);
 }
 
+.order_place:disabled {
+    background: #ddd;
+    color: #666;
+}
+
 .contact-section {
     padding: 15px 0;
     background: #fff;
@@ -3005,7 +3027,7 @@ button.owl-prev {
     right: 0;
 }
 
-li.cat_bar > a {
+li.cat_bar>a {
     padding: 13px 5px;
     display: flex;
     width: 100%;
@@ -3112,7 +3134,7 @@ ul.child_menu li a {
     color: #087bce;
 }
 
-.child_main > a {
+.child_main>a {
     font-size: 14px;
     color: #444 !important;
     text-transform: capitalize !important;
@@ -3138,7 +3160,7 @@ ul.child_sub li a {
     color: #666 !important;
 }
 
-li.child_main > a {
+li.child_main>a {
     font-size: 14px;
     font-weight: 500;
     color: #000 !important;
@@ -3553,8 +3575,9 @@ ul.social_link {
     height: 0;
     width: 0;
 }
+
 /* Style for when an item is selected */
-.selector-item input[type="radio"]:checked + label {
+.selector-item input[type="radio"]:checked+label {
     border: 2px solid #007bff;
     background-color: #e9f1ff;
     border-radius: 5px;
@@ -3834,7 +3857,7 @@ span.sale-badge-text p {
     margin-right: 5px;
 }
 
-.sub-category > li {
+.sub-category>li {
     position: relative;
 }
 
@@ -3849,7 +3872,7 @@ ul.child-category {
     transition: all 0.5s;
 }
 
-.sub-category > li:hover .child-category {
+.sub-category>li:hover .child-category {
     visibility: visible;
     opacity: 1;
 }
@@ -3970,7 +3993,7 @@ ul.child-category {
     margin: 5px 0;
 }
 
-.sidebar-submenu > li {
+.sidebar-submenu>li {
     position: relative !important;
 }
 
@@ -3991,7 +4014,7 @@ ul.child-category {
     border-radius: 5px;
 }
 
-.sidebar-menu ul li:hover > a {
+.sidebar-menu ul li:hover>a {
     background-color: #fff;
     color: #222;
 }
@@ -4006,7 +4029,7 @@ ul.child-category {
     display: block;
 }
 
-.sidebar-submenu > li:hover .sidebar-childmenu {
+.sidebar-submenu>li:hover .sidebar-childmenu {
     visibility: visible;
     opacity: 1;
     right: -100%;
@@ -4101,11 +4124,9 @@ td.tfoot_bg {
 }
 
 .product-details-discount-badge span.sale-badge-text {
-    background-image: linear-gradient(
-        135deg,
-        var(--brand-color),
-        var(--secondary-color)
-    );
+    background-image: linear-gradient(135deg,
+            var(--brand-color),
+            var(--secondary-color));
     width: 66px;
     height: 35px;
     display: flex;
@@ -4116,7 +4137,7 @@ td.tfoot_bg {
     color: #fff;
     font-size: 11px;
     font-weight: 600;
-    
+
     strong {
         font-size: 13px;
         font-family: "Poppins", sans-serif;
@@ -4449,6 +4470,7 @@ a.whatsapp_bg {
     font-size: 15px;
     font-family: "Noto Sans Bengali", sans-serif;
 }
+
 .product-labels {
     position: absolute;
     top: 7px;
@@ -4462,10 +4484,12 @@ a.whatsapp_bg {
     transition: all 0.3s ease;
     transform: translateZ(0);
 }
+
 .product-labels.labels-rectangular {
     top: 15px;
     inset-inline-start: 0;
 }
+
 .product-label {
     padding: 5px 10px;
     min-width: 50px;
@@ -4477,10 +4501,12 @@ a.whatsapp_bg {
     font-size: 12px;
     line-height: 1.2;
 }
+
 .product-label.onsale {
     background-color: var(--brand-color);
     direction: ltr;
 }
+
 .pro_img {
     height: 185px;
     position: relative;
@@ -4491,7 +4517,7 @@ a.whatsapp_bg {
     border-bottom: 1px solid #ddd;
 }
 
-.pro_img > a {
+.pro_img>a {
     display: block;
 }
 
@@ -4544,6 +4570,7 @@ a.whatsapp_bg {
 .pro_ratting i.fas.fa-star-half-alt {
     color: #d7a62c;
 }
+
 .pro_ratting i.far.fa-star {
     color: #ddd;
 }
@@ -4611,11 +4638,9 @@ a.whatsapp_bg {
 }
 
 a.show-all-btn {
-    background-image: linear-gradient(
-        135deg,
-        var(--brand-color),
-        var(--secondary-color)
-    );
+    background-image: linear-gradient(135deg,
+            var(--brand-color),
+            var(--secondary-color));
     color: #fff;
     font-size: 12px;
     border-radius: 25px;
@@ -5057,14 +5082,12 @@ ul.menu-link-ul {
 }
 
 .menu-link-list .menu-item-link.pc-builder-link {
-    background: linear-gradient(
-        89deg,
-        #a40606,
-        rgb(248 86 57),
-        rgb(248 86 57),
-        #43378e,
-        #00237e
-    );
+    background: linear-gradient(89deg,
+            #a40606,
+            rgb(248 86 57),
+            rgb(248 86 57),
+            #43378e,
+            #00237e);
     background-size: 500% 20%;
     animation: gradient 10s ease infinite;
 }
@@ -5444,6 +5467,7 @@ p#resendText {
     font-size: 13px;
     right: 0;
 }
+
 button.details-action-btn {
     padding: 5px 20px;
     background-color: #fff;
@@ -5455,7 +5479,8 @@ button.details-action-btn {
     background: var(--brand-color);
     cursor: pointer;
 }
-.review-image-block .owl-carousel .owl-nav button.owl-next, 
+
+.review-image-block .owl-carousel .owl-nav button.owl-next,
 .review-image-block .owl-carousel .owl-nav button.owl-prev {
     background-image: linear-gradient(45deg, var(--brand-color), var(--secondary-color));
     position: absolute;

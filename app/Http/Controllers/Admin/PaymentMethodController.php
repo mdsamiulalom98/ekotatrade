@@ -11,13 +11,13 @@ use App\Models\PaymentMethod;
 
 class PaymentMethodController extends Controller
 {
-    // function __construct()
-    // {
-    //      $this->middleware('permission:paymentmethod-list|paymentmethod-create|paymentmethod-edit|paymentmethod-delete', ['only' => ['index','show']]);
-    //      $this->middleware('permission:paymentmethod-create', ['only' => ['create','store']]);
-    //      $this->middleware('permission:paymentmethod-edit', ['only' => ['edit','update']]);
-    //      $this->middleware('permission:paymentmethod-delete', ['only' => ['destroy']]);
-    // }
+    function __construct()
+    {
+         $this->middleware('permission:paymentmethod-list|paymentmethod-create|paymentmethod-edit|paymentmethod-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:paymentmethod-create', ['only' => ['create','store']]);
+         $this->middleware('permission:paymentmethod-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:paymentmethod-delete', ['only' => ['destroy']]);
+    }
     public function index(Request $request)
     {
         $show_data = PaymentMethod::orderBy('id', 'DESC')->get();

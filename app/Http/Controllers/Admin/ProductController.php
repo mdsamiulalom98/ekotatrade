@@ -66,7 +66,6 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // return $request->all();
         $this->validate($request, [
             'name' => 'required',
             'category_id' => 'required',
@@ -84,8 +83,9 @@ class ProductController extends Controller
         $input['status'] = $request->status ? 1 : 0;
         $input['topsale'] = $request->topsale ? 1 : 0;
         $input['product_code'] = 'P' . str_pad($last_id, 4, '0', STR_PAD_LEFT);
+        $new_prices = array_filter($request->new_prices);
 
-        if ($request->new_prices) {
+        if ($new_prices && count($new_prices) > 0) {
             $veriable_new = 0;
             $new_prices = array_filter($request->new_prices);
             if (is_array($new_prices)) {
@@ -95,10 +95,10 @@ class ProductController extends Controller
                     }
                 }
             }
-            // return $veriable_new;
             $input['new_price'] = $veriable_new;
+        } else {
+            $input['new_price'] = $request->new_price;
         }
-
 
         $save_data = Product::create($input);
 

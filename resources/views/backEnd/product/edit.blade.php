@@ -1,5 +1,5 @@
-@extends('backEnd.layouts.master') 
-@section('title','Product Edit') 
+@extends('backEnd.layouts.master')
+@section('title','Product Edit')
 @section('css')
 <style>
   .increment_btn,
@@ -244,7 +244,7 @@
                     <div class="col-sm-2">
                         <div class="form-group">
                             <label for="up_stocks" class="form-label">Stock *</label>
-                            <input type="text" class="form-control" name="up_stocks[]" value="{{$variable->stock}}">
+                            <input type="number" class="form-control" name="up_stocks[]" value="{{$variable->stock}}">
                             @error('up_stocks')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -537,7 +537,7 @@
               </div>
             </div>
             <!-- normal product end -->
-            
+
             <!-- col end -->
             <div class="col-sm-6">
               <div class="form-group mb-3">
@@ -622,7 +622,7 @@
              <div class="col-sm-6">
               <div class="form-group mb-3">
                 <label for="product_warranty" class="form-label">Product Warranty *</label>
-                
+
                 <input type="number" class="form-control @error('product_warranty') is-invalid @enderror" name="product_warranty" value="{{ $edit_data->product_warranty }}" id="product_warranty" required="" />
                 @error('product_warranty')
                 <span class="invalid-feedback" role="alert">
@@ -668,7 +668,7 @@
               </div>
             </div>
             <!-- col end -->
-           
+
             <!-- col end -->
             <div class="col-sm-3 mb-3">
               <div class="form-group">
@@ -700,7 +700,7 @@
               </div>
             </div>
             <!-- col end -->
-            
+
             <div>
               <input type="submit" class="btn btn-success" value="Submit" />
             </div>
@@ -724,7 +724,7 @@
   $(".summernote").summernote({
     placeholder: "Enter Your Text Here",
   });
-  
+
   function preventSpace(event) {
   if (event.keyCode === 32) {
     event.preventDefault();

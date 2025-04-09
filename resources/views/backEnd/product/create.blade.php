@@ -1,5 +1,5 @@
-@extends('backEnd.layouts.master') 
-@section('title','Product Create') 
+@extends('backEnd.layouts.master')
+@section('title','Product Create')
 @section('css')
 <style>
   .increment_btn,
@@ -194,7 +194,7 @@
                 <div class="col-sm-3">
                   <div class="form-group mb-3">
                     <label for="stock" class="form-label">Stock *</label>
-                    <input type="text" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock') }}" id="stock" />
+                    <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock') }}" id="stock" />
                     @error('stock')
                     <span class="invalid-feedback" role="alert">
                       <strong>{{ $message }}</strong>
@@ -283,7 +283,7 @@
                     <div class="col-sm-2">
                         <div class="form-group">
                             <label for="stocks" class="form-label">Stock *</label>
-                            <input type="text" class="form-control" name="stocks[]">
+                            <input type="number" class="form-control" name="stocks[]">
                             @error('stocks')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -291,7 +291,7 @@
                             @enderror
                         </div>
                     </div>
-                    
+
                     <!-- col end -->
                     <div class="col-sm-12 mb-3">
                       <label for="images">Image (400x360px) (optional)</label>
@@ -386,7 +386,7 @@
                       <div class="col-sm-2">
                           <div class="form-group">
                               <label for="stocks" class="form-label">Stock *</label>
-                              <input type="text" class="form-control @error('stock') is-invalid @enderror" name="stocks[]" value="{{ old('stocks') }}" id="stocks">
+                              <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stocks[]" value="{{ old('stocks') }}" id="stocks">
                               @error('stocks[]')
                                   <span class="invalid-feedback" role="alert">
                                       <strong>{{ $message }}</strong>
@@ -448,7 +448,7 @@
                 @enderror
               </div>
             </div>
-            
+
             <div class="col-sm-6">
               <div class="form-group mb-3">
                 <label for="product_qr" class="form-label">Product Qr Code</label>
@@ -498,7 +498,7 @@
             <div class="col-sm-6">
               <div class="form-group mb-3">
                 <label for="product_warranty" class="form-label">Product Warranty *</label>
-                
+
                 <input type="number" class="form-control @error('product_warranty') is-invalid @enderror" name="product_warranty" value="{{ old('product_warranty') }}" id="product_warranty" required="" />
                 @error('product_warranty')
                 <span class="invalid-feedback" role="alert">
@@ -544,7 +544,7 @@
               </div>
             </div>
             <!-- col end -->
-           
+
             <!-- col end -->
             <div class="col-sm-3 mb-3">
               <div class="form-group">
@@ -600,7 +600,7 @@
   $(".summernote").summernote({
     placeholder: "Enter Your Text Here",
   });
-  
+
     function preventSpace(event) {
   if (event.keyCode === 32) {
     event.preventDefault();

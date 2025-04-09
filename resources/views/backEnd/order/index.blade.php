@@ -3,7 +3,7 @@
 @section('content')
     <div class="container-fluid">
         <!-- start page title -->
-        <div class="row">
+        <div class="row ">
             <div class="col-12">
                 <div class="page-title-box">
                     <div class="page-title-right">
@@ -39,10 +39,15 @@
                                                 class="btn rounded-pill btn-warning multi_order_courier"><i
                                                     class="fe-truck"></i> SteadFast</a></li>
                                     @endif
-                                    <li><a href="{{ route('admin.order.bulk_destroy') }}"
-                                            class="btn rounded-pill btn-danger order_delete"><i class="fe-plus"></i> Delete
-                                            All</a></li>
-
+                                    @can('order-delete')
+                                        <li>
+                                            <a href="{{ route('admin.order.bulk_destroy') }}"
+                                                class="btn rounded-pill btn-danger order_delete">
+                                                <i class="fe-plus"></i>
+                                                Delete All
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
                             </div>
                             <div class="col-sm-4">
@@ -54,80 +59,101 @@
                                 </form>
                             </div>
                         </div>
-                        <div class="table-responsive ">
+                        <div class="table-responsive " style="overflow-y: scroll; height: 100vh;">
                             <table id="datatable-buttons" class="table table-striped   w-100">
                                 <thead>
                                     <tr>
                                         <th style="width:2%">
-                                            <div class="form-check"><label class="form-check-label"><input type="checkbox"
-                                                        class="form-check-input checkall" value=""></label>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" class="form-check-input checkall" value="">
+                                                </label>
+                                            </div>
+                                        </th>
                                         <th style="width:2%">SL</th>
+                                        <th style="width:8%">Action</th>
+                                        <th style="width:8%">Invoice</th>
+                                        <th style="width:10%">Date</th>
+                                        <th style="width:10%">Name</th>
+                                        <th style="width:10%">Phone</th>
+                                        <th style="width:10%">Courier ID</th>
+                                        <th style="width: 10%">Order Note</th>
+                                        <th style="width:10%">Amount</th>
+                                        <th style="width:10%">Status</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach ($show_data as $key => $value)
+                                        <tr>
+                                            <td><input type="checkbox" class="checkbox" value="{{ $value->id }}"></td>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                <div class="button-list custom-btn-list">
+                                                    @can('order-view')
+                                                        <a href="{{ route('admin.order.invoice', ['id' => $value->id]) }}"
+                                                            title="Invoice"><i class="fe-download"></i></a>
+                                                    @endcan
+                                                    <a data-bs-toggle="modal" data-bs-target="#order{{ $value->id }}"
+                                                        title="Order Details"><i class="fe-eye"></i></a>
+                                                    <a href="{{ route('admin.order.process', ['id' => $value->invoice_id]) }}"
+                                                        title="Process"><i class="fe-settings"></i></a>
+                                                    <a href="{{ route('admin.order.edit', ['id' => $value->id]) }}"
+                                                        title="Edit"><i class="fe-edit"></i></a>
+                                                    @can('order-delete')
+                                                        <form method="post" action="{{ route('admin.order.destroy') }}"
+                                                            class="d-inline">
+                                                            @csrf
+                                                            <input type="hidden" value="{{ $value->id }}" name="id">
+                                                            <button type="submit" title="Delete" class="delete-confirm">
+                                                                <i class="fe-trash-2"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                    <a data-bs-toggle="modal" data-bs-target="#orderNote" title="Note"
+                                                        class="order_note" data-id="{{ $value->id }}">
+                                                        <i class="fe-file-text"></i>
+                                                    </a>
+                                                    <a data-bs-toggle="modal" data-bs-target="#pathao{{ $value->id }}"
+                                                        class="btn btn-success">pathao</a>
+                                                </div>
+                                            </td>
+                                            <td><a
+                                                    href="{{ route('admin.order.slip', ['id' => $value->id]) }}"><u>{{ $value->invoice_id }}</u></a>
+                                                <br> {{ $value->customer_ip }}
+                                            </td>
+                                            <td>{{ date('d-m-Y', strtotime($value->updated_at)) }}<br>
+                                                {{ date('h:i:s a', strtotime($value->updated_at)) }}</td>
+                                            <td><strong>{{ $value->shipping ? $value->shipping->name : '' }}</strong>
+                                                <p>{{ $value->shipping ? $value->shipping->address : '' }}</p>
+                                            </td>
+                                            <td>{{ $value->shipping ? $value->shipping->phone : '' }}</td>
+                                            <td>{{ $value->courier_tracker }}</td>
+                                            <td>
+                                                @if ($value->ordernote)
+                                                    <p>{{ $value->ordernote->note }}</p>
+                                                    <a data-bs-toggle="modal" data-bs-target="#orderNote{{ $value->id }}"
+                                                        title="Order Note"><i class="fe-file-text"></i></a>
+                                                @else
+                                                    <p></p>
+                                                @endif
+                                            </td>
+                                            <td>৳{{ $value->amount }}</td>
+                                            <td>{{ $value->status ? $value->status->name : '' }}</td>
+
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                        </th>
-                        <th style="width:8%">Action</th>
-                        <th style="width:8%">Invoice</th>
-                        <th style="width:10%">Date</th>
-                        <th style="width:10%">Name</th>
-                        <th style="width:10%">Phone</th>
-                        <th style="width:10%">Courier ID</th>
-                        <th style="width:10%">Amount</th>
-                        <th style="width:10%">Status</th>
-                        </tr>
-                        </thead>
+                        <div class="custom-paginate">
+                            {{ $show_data->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div> <!-- end card body-->
 
-
-                        <tbody>
-                            @foreach ($show_data as $key => $value)
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox" value="{{ $value->id }}"></td>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>
-                                        <div class="button-list custom-btn-list">
-                                            <a href="{{ route('admin.order.invoice', ['id' => $value->id]) }}"
-                                                title="Invoice"><i class="fe-download"></i></a>
-                                            <a data-bs-toggle="modal" data-bs-target="#order{{ $value->id }}"
-                                                title="Order Details"><i class="fe-eye"></i></a>
-                                            <a href="{{ route('admin.order.process', ['id' => $value->invoice_id]) }}"
-                                                title="Process"><i class="fe-settings"></i></a>
-                                            <a href="{{ route('admin.order.edit', ['id' => $value->id]) }}" title="Edit"><i
-                                                    class="fe-edit"></i></a>
-                                            <form method="post" action="{{ route('admin.order.destroy') }}"
-                                                class="d-inline">
-                                                @csrf
-                                                <input type="hidden" value="{{ $value->id }}" name="id">
-                                                <button type="submit" title="Delete" class="delete-confirm"><i
-                                                        class="fe-trash-2"></i></button>
-                                            </form>
-                                            <a data-bs-toggle="modal" data-bs-target="#pathao{{ $value->id }}"
-                                                class="btn btn-success">pathao</a>
-                                        </div>
-                                    </td>
-                                    <td><a
-                                            href="{{ route('admin.order.slip', ['id' => $value->id]) }}"><u>{{ $value->invoice_id }}</u></a>
-                                        <br> {{ $value->customer_ip }}</td>
-                                    <td>{{ date('d-m-Y', strtotime($value->updated_at)) }}<br>
-                                        {{ date('h:i:s a', strtotime($value->updated_at)) }}</td>
-                                    <td><strong>{{ $value->shipping ? $value->shipping->name : '' }}</strong>
-                                        <p>{{ $value->shipping ? $value->shipping->address : '' }}</p>
-                                    </td>
-                                    <td>{{ $value->shipping ? $value->shipping->phone : '' }}</td>
-                                    <td>{{ $value->courier_tracker }}</td>
-                                    <td>৳{{ $value->amount }}</td>
-                                    <td>{{ $value->status ? $value->status->name : '' }}</td>
-
-                                </tr>
-                            @endforeach
-                        </tbody>
-                        </table>
-                    </div>
-                    <div class="custom-paginate">
-                        {{ $show_data->links('pagination::bootstrap-4') }}
-                    </div>
-                </div> <!-- end card body-->
-
-            </div> <!-- end card -->
-        </div><!-- end col-->
-    </div>
+                </div> <!-- end card -->
+            </div><!-- end col-->
+        </div>
     </div>
     <!-- Assign User End -->
     <div class="modal fade" id="asignUser" tabindex="-1">
@@ -308,8 +334,7 @@
                                                         <div class="model-item">
                                                             <ul class="list-unstyled mt-2">
                                                                 <li><strong>Email</strong></li>
-                                                                <li> <a
-                                                                        href="#">{{ $value->shipping->email ?? '' }}</a>
+                                                                <li> <a href="#">{{ $value->shipping->email ?? '' }}</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
@@ -381,7 +406,8 @@
                                             <tbody>
                                                 @foreach ($value->orderdetails as $detail)
                                                     <tr>
-                                                        <td style="width: 40%;">{{ $detail->product_name }} @if ($detail->product_size)
+                                                        <td style="width: 40%;">{{ $detail->product_name }}
+                                                            @if ($detail->product_size)
                                                                 <br> Size: {{ $detail->product_size }}
                                                             @endif
                                                             <br>
@@ -407,31 +433,109 @@
                     <div class="modal-footer">
                         <!--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
                         <!--<button type="submit" class="btn btn-success">Submit</button>-->
-                        <a class="btn btn-success" href="{{ route('admin.order.edit', ['id' => $value->id]) }}"
-                            title="Edit"> Edit </a>
+                        <a class="btn btn-success" href="{{ route('admin.order.edit', ['id' => $value->id]) }}" title="Edit">
+                            Edit </a>
                     </div>
                 </div>
             </div>
         </div>
     @endforeach
     <!-- order details ends -->
+    <!-- order details starts -->
+    @foreach ($show_data as $key => $value)
+        <div class="modal fade" id="orderNote{{ $value->id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="border-bottom: 1px solid #ddd;">
+                        <h5 class="modal-title">Order #{{ $value->invoice_id }} </h5>
+                        <span style="flex: 1 1 auto;text-align: right;color: green;font-size: 14px;font-weight: 600;">Order
+                            {{ $value->status->name ?? '' }}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <section class="seection-padding">
+                            <div class="cart_details table-responsive-sm">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Order Notes</h5>
+                                    </div>
+                                    <div class="card-body cartlist">
+                                        <table class="cart_table table table-bordered table-striped text-center mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 60%;">Date</th>
+                                                    <th style="width: 40%;">Note</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @foreach ($value->ordernotes as $note)
+                                                    <tr>
+                                                        <td style="width: 60%;">
+                                                            {{ date('d-m-Y', strtotime($note->created_at)) }}<br>
+                                                            {{ date('h:i:s a', strtotime($note->created_at)) }}
+                                                        </td>
+                                                        <td style="width: 40%;">{{ $note->note }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- form group end -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    @endforeach
+    <!-- order details ends -->
+    <!-- Assign User End -->
+    <div class="modal fade" id="orderNote" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('admin.order.note_create') }}" id="order_note_form" method="POST">
+                    @csrf
+                    <input type="hidden" name="order_id" id="order_id">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="order_note" class="form-label">Order Note</label>
+                            <textarea name="order_note" id="order_note" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success ">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Assign User End-->
     <!-- pathao courier  End-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $(".checkall").on('change', function() {
+        $(document).ready(function () {
+            $(".checkall").on('change', function () {
                 $(".checkbox").prop('checked', $(this).is(":checked"));
             });
 
             // order assign
-            $(document).on('submit', 'form#order_assign', function(e) {
+            $(document).on('submit', 'form#order_assign', function (e) {
                 $(".asign_user_button").prop('disabled', true);
                 e.preventDefault();
                 var url = $(this).attr('action');
                 var method = $(this).attr('method');
                 let user_id = $(document).find('select#user_id').val();
 
-                var order = $('input.checkbox:checked').map(function() {
+                var order = $('input.checkbox:checked').map(function () {
                     return $(this).val();
                 });
                 var order_ids = order.get();
@@ -448,7 +552,7 @@
                         user_id,
                         order_ids
                     },
-                    success: function(res) {
+                    success: function (res) {
                         if (res.status == 'success') {
                             toastr.success(res.message);
                             window.location.reload();
@@ -460,20 +564,24 @@
                 });
 
             });
-            
-             $(document).on('change', 'form#order_assign', function(e) {
-                 $(".asign_user_button").prop('disabled', false);
+
+            $(document).on('change', 'form#order_assign', function (e) {
+                $(".asign_user_button").prop('disabled', false);
             });
-            
-            
-            $(document).on('submit', 'form#order_status_form', function(e) {
+
+            $(document).on('click', '.order_note', function (e) {
+                var id = $(this).data('id');
+                $('#order_id').val(id);
+            });
+
+            $(document).on('submit', 'form#order_status_form', function (e) {
                 $(".change_status_button").prop('disabled', true);
                 e.preventDefault();
                 var url = $(this).attr('action');
                 var method = $(this).attr('method');
                 let order_status = $(document).find('select#order_status').val();
 
-                var order = $('input.checkbox:checked').map(function() {
+                var order = $('input.checkbox:checked').map(function () {
                     return $(this).val();
                 });
                 var order_ids = order.get();
@@ -490,7 +598,7 @@
                         order_status,
                         order_ids
                     },
-                    success: function(res) {
+                    success: function (res) {
                         if (res.status == 'success') {
                             toastr.success(res.message);
                             window.location.reload();
@@ -500,20 +608,19 @@
                         }
                     }
                 });
+            });
 
-            });
-            
             // order status change
-            $(document).on('change', 'form#order_status_form', function(e) {
-                 $(".change_status_button").prop('disabled', false);
+            $(document).on('change', 'form#order_status_form', function (e) {
+                $(".change_status_button").prop('disabled', false);
             });
-            
+
             // order delete
-            $(document).on('click', '.order_delete', function(e) {
+            $(document).on('click', '.order_delete', function (e) {
                 $(".order_delete").prop('disabled', true);
                 e.preventDefault();
                 var url = $(this).attr('href');
-                var order = $('input.checkbox:checked').map(function() {
+                var order = $('input.checkbox:checked').map(function () {
                     return $(this).val();
                 });
                 var order_ids = order.get();
@@ -530,7 +637,7 @@
                     data: {
                         order_ids
                     },
-                    success: function(res) {
+                    success: function (res) {
                         if (res.status == 'success') {
                             toastr.success(res.message);
                             window.location.reload();
@@ -544,11 +651,11 @@
             });
 
             // multiple print
-            $(document).on('click', '.multi_order_print', function(e) {
-                 $(".multi_order_print").prop('disabled', true);
+            $(document).on('click', '.multi_order_print', function (e) {
+                $(".multi_order_print").prop('disabled', true);
                 e.preventDefault();
                 var url = $(this).attr('href');
-                var order = $('input.checkbox:checked').map(function() {
+                var order = $('input.checkbox:checked').map(function () {
                     return $(this).val();
                 });
                 var order_ids = order.get();
@@ -563,7 +670,7 @@
                     data: {
                         order_ids
                     },
-                    success: function(res) {
+                    success: function (res) {
                         if (res.status == 'success') {
                             console.log(res.items, res.info);
                             var myWindow = window.open("", "_blank");
@@ -575,11 +682,11 @@
                 });
             });
             // multiple print
-            $(document).on('click', '.multi_pos_print', function(e) {
-                 $(".multi_pos_print").prop('disabled', true);
+            $(document).on('click', '.multi_pos_print', function (e) {
+                $(".multi_pos_print").prop('disabled', true);
                 e.preventDefault();
                 var url = $(this).attr('href');
-                var order = $('input.checkbox:checked').map(function() {
+                var order = $('input.checkbox:checked').map(function () {
                     return $(this).val();
                 });
                 var order_ids = order.get();
@@ -594,7 +701,7 @@
                     data: {
                         order_ids
                     },
-                    success: function(res) {
+                    success: function (res) {
                         if (res.status == 'success') {
                             console.log(res.items, res.info);
                             var myWindow = window.open("", "_blank");
@@ -606,11 +713,11 @@
                 });
             });
             // multiple courier
-            $(document).on('click', '.multi_order_courier', function(e) {
-                 $(".multi_order_courier").prop('disabled', true);
+            $(document).on('click', '.multi_order_courier', function (e) {
+                $(".multi_order_courier").prop('disabled', true);
                 e.preventDefault();
                 var url = $(this).attr('href');
-                var order = $('input.checkbox:checked').map(function() {
+                var order = $('input.checkbox:checked').map(function () {
                     return $(this).val();
                 });
                 var order_ids = order.get();
@@ -626,7 +733,7 @@
                     data: {
                         order_ids
                     },
-                    success: function(res) {
+                    success: function (res) {
                         if (res.status == 'success') {
                             toastr.success(res.message);
                             window.location.reload();

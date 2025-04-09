@@ -553,13 +553,13 @@ class CustomerController extends Controller
                         $textmsg->to($data['email']);
                         $textmsg->subject('Your order successfully placed To Ekota Trade');
                     });
-            
+
                     // Status for successful email
                     $emailStatus = 'success';
                 } catch (\Exception $e) {
                     // Log the error for debugging
                     \Log::error('Mail sending failed: ' . $e->getMessage());
-            
+
                     // Status for failed email
                     $emailStatus = 'failed';
                 }
@@ -574,13 +574,13 @@ class CustomerController extends Controller
                     $textmsg->to($data['email']);
                     $textmsg->subject('Your order successfully placed To Ekota Trade');
                 });
-        
+
                 // Status for successful email
                 $emailStatus = 'success';
             } catch (\Exception $e) {
                 // Log the error for debugging
                 \Log::error('Mail sending failed: ' . $e->getMessage());
-        
+
                 // Status for failed email
                 $emailStatus = 'failed';
             }
@@ -597,7 +597,7 @@ class CustomerController extends Controller
                         CURLOPT_CUSTOMREQUEST => 'POST',
                         CURLOPT_POSTFIELDS => array(
                             'api_key' => "$sms_gateway->api_key",
-                            'msg' => "্রিয় $shipping->name \r\n আপনার অর্ডার #$order->invoice_id ি সম্পন্ন হ়েছে! অর্ডাটি ট্র্যাক রতে ক্লিক কুন: https://www.ekotatrade.com.bd/customer/order-track/result?phone=$shipping->phone&invoice_id=$order->invoice_id \r\n একতা ট্রেড এর সাথে থাকার ন্য ধন্যবাদ!",
+                            "msg" => "আপনার অর্ডারটি নিশ্চিত করা হয়েছে। ইনভয়েস দেখতে নিচের লিংকটি ভিজিট করুন: \n https://www.ekotatrade.com.bd/customer/invoice?$order->id \n Ekota Trade-এর সাথে থাকার জন্য ধন্যবাদ।",
                             'to' => $request->phone
                         ),
                     )

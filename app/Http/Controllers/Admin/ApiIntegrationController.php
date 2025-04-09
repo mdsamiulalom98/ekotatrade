@@ -10,6 +10,11 @@ use App\Models\Courierapi;
 
 class ApiIntegrationController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('permission:paymentgateway-list', ['only' => ['pay_manage', 'pay_update']]);
+        $this->middleware('permission:smsgateway-list', ['only' => ['sms_manage', 'sms_update']]);
+        $this->middleware('permission:courierapi-list', ['only' => ['courier_manage', 'courier_update']]);}
     public function pay_manage()
     {
         $bkash = PaymentGateway::where('type', '=', 'bkash')->first();

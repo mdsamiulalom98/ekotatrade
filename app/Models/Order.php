@@ -44,4 +44,11 @@ class Order extends Model
     {
         return $this->belongsTo(User::class,'user_id');
     }
+    public function ordernote()
+    {
+        return $this->hasOne(OrderNote::class, 'order_id')->latest();
+    }
+    public function ordernotes() {
+        return $this->hasMany(OrderNote::class, 'order_id');
+    }
 }

@@ -499,6 +499,7 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::get('order/{slug}', [OrderController::class, 'index'])->name('admin.orders');
     Route::get('order/edit/{id}', [OrderController::class, 'order_edit'])->name('admin.order.edit');
     Route::post('order/update', [OrderController::class, 'order_update'])->name('admin.order.update');
+    Route::post('order/note/create', [OrderController::class, 'order_note_create'])->name('admin.order.note_create');
     Route::get('order/invoice/{id}', [OrderController::class, 'invoice'])->name('admin.order.invoice');
     Route::get('order/slip/{id}', [OrderController::class, 'slip'])->name('admin.order.slip');
     Route::get('order/process/{id}', [OrderController::class, 'process'])->name('admin.order.process');

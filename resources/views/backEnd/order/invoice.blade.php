@@ -212,8 +212,7 @@
                                         ?></td>
                                         <td><strong>Bill of Goods</strong></td>
                                         {{-- <td><strong>৳{{ $order->amount + $order->discount - $order->shipping_charge }}</strong> --}}
-                                        <td><strong>৳{{ $subtotal }}</strong>
-                                        </td>
+                                        <td><strong>৳{{ $subtotal }}</strong></td>
                                     </tr>
                                     <tr>
                                         <td><strong>Discount(-)</strong></td>
@@ -246,28 +245,44 @@
                                 style="overflow: hidden; width: 100%; text-align: center; padding: 10px 0 0; border-top: 1px solid #ddd;">
                             </div>
 
-                            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                                <div
-                                    style="height: 100px;border: 1px solid #ddd;width: 50%;padding: 10px;border-right: none;">
-                                    <strong style="margin-top: 60px;display: block; text-align: center;">Customer /
-                                        Receiver</strong>
-                                </div>
-                                <div style="height: 100px;border: 1px solid #ddd; width: 50%; padding: 10px;">
-                                    <strong style="margin-top: 60px;display: block; text-align: center;">Authorized
-                                        Signature and Seal</strong>
-                                </div>
-                            </div>
+
                         </div>
                         <div style="font-size: 14px; color: #222; margin: 10px 0 4px;">
-                            <p><strong>Payment Method:</strong> <span
-                                    style="text-transform: uppercase;">{{ $order->payment->payment_method ?? '' }}</span>
-                            </p>
-                            @if ($order->payment)
-                                <p>Trx ID : {{ $order->payment->trx_id ?? '' }}</p>
-                            @endif
-                            @if ($order->payment)
-                                <p>Sender Number : {{ $order->payment->sender_number ?? '' }}</p>
-                            @endif
+                            <table class="table table-bordered" style="width: 100%; margin-bottom: 0;">
+                                <thead>
+                                    <tr>
+                                        <th>Sl</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Sender Number</th>
+                                        <th>Transaction</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($order->payments as $key => $history)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $history->created_at->format('d-m-Y') }}</td>
+                                            <td>{{ $history->payment_method }}</td>
+                                            <td>{{ $history->sender_number }}</td>
+                                            <td>{{ $history->trx_id }}</td>
+                                            <td>৳{{ $history->amount }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                            <div
+                                style="height: 100px;border: 1px solid #ddd;width: 50%;padding: 10px;border-right: none;">
+                                <strong style="margin-top: 60px;display: block; text-align: center;">Customer /
+                                    Receiver</strong>
+                            </div>
+                            <div style="height: 100px;border: 1px solid #ddd; width: 50%; padding: 10px;">
+                                <strong style="margin-top: 60px;display: block; text-align: center;">Authorized
+                                    Signature and Seal</strong>
+                            </div>
                         </div>
                     </div>
                 </div>

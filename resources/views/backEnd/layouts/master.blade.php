@@ -57,8 +57,8 @@
                     </li>
 
                     <li class="dropdown notification-list topbar-dropdown">
-                        <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown"
-                            href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#"
+                            role="button" aria-haspopup="false" aria-expanded="false">
                             <i class="fe-bell noti-icon"></i>
                             <span class="badge bg-danger rounded-circle noti-icon-badge">{{ $neworder }}</span>
                         </a>
@@ -140,15 +140,12 @@
                             <div class="dropdown-divider"></div>
 
                             <!-- item-->
-                            <a href="{{ route('logout') }}"
-                                onclick="event.preventDefault();
-                  document.getElementById('logout-form').submit();"
-                                class="dropdown-item notify-item">
+                            <a href="{{ route('logout') }}" onclick="event.preventDefault();
+                  document.getElementById('logout-form').submit();" class="dropdown-item notify-item">
                                 <i class="fe-log-out me-1"></i>
                                 <span>Logout</span>
                             </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                style="display: none;">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
                         </div>
@@ -248,15 +245,13 @@
                             </a>
 
                             <!-- item-->
-                            <a href="{{ route('logout') }}"
-                                onclick="event.preventDefault();
+                            <a href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();"
                                 class="dropdown-item notify-item">
                                 <i class="fe-log-out me-1"></i>
                                 <span>Logout</span>
                             </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                style="display: none;">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
                         </div>
@@ -317,8 +312,8 @@
                                             Subcategories</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('childcategories.index') }}"><i
-                                                data-feather="file-plus"></i> Childcategories</a>
+                                        <a href="{{ route('childcategories.index') }}"><i data-feather="file-plus"></i>
+                                            Childcategories</a>
                                     </li>
                                     <li>
                                         <a href="{{ route('brands.index') }}"><i data-feather="file-plus"></i>
@@ -433,59 +428,70 @@
                             </div>
                         </li>
                         <!-- nav items end -->
+                        @can('role-list')
 
-                        <li>
-                            <a href="#sidebar-users" data-bs-toggle="collapse">
-                                <i data-feather="user"></i>
-                                <span> Admin & Customer </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="sidebar-users">
-                                <ul class="nav-second-level">
-                                    <li>
-                                        <a href="{{ route('users.index') }}"><i data-feather="file-plus"></i>
-                                            User</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('roles.index') }}"><i data-feather="file-plus"></i>
-                                            Roles</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('permissions.index') }}"><i data-feather="file-plus"></i>
-                                            Permissions</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('customers.index') }}"><i data-feather="file-plus"></i>
-                                            Customers</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
+                            <li>
+                                <a href="#sidebar-users" data-bs-toggle="collapse">
+                                    <i data-feather="user"></i>
+                                    <span> Admin & Customer </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <div class="collapse" id="sidebar-users">
+                                    <ul class="nav-second-level">
+                                        <li>
+                                            <a href="{{ route('users.index') }}"><i data-feather="file-plus"></i>
+                                                User</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('roles.index') }}"><i data-feather="file-plus"></i>
+                                                Roles</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('permissions.index') }}"><i data-feather="file-plus"></i>
+                                                Permissions</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('customers.index') }}"><i data-feather="file-plus"></i>
+                                                Customers</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        @endcan
                         <!-- nav items -->
-                        <li>
-                            <a href="#sidebar-api-integration" data-bs-toggle="collapse">
-                                <i data-feather="save"></i>
-                                <span> API Integration </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="sidebar-api-integration">
-                                <ul class="nav-second-level">
-                                    <li>
-                                        <a href="{{ route('paymentgeteway.manage') }}"><i
-                                                data-feather="file-plus"></i> Payment Gateway</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('smsgeteway.manage') }}"><i data-feather="file-plus"></i>
-                                            SMS Gateway</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('courierapi.manage') }}"><i data-feather="file-plus"></i>
-                                            Courier API</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <!-- nav items end -->
+                        @can('paymentgateway-list|smsgateway-list|courierapi-list')
+
+                            <li>
+                                <a href="#sidebar-api-integration" data-bs-toggle="collapse">
+                                    <i data-feather="save"></i>
+                                    <span> API Integration </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <div class="collapse" id="sidebar-api-integration">
+                                    <ul class="nav-second-level">
+                                        @can('paymentgateway-list')
+                                            <li>
+                                                <a href="{{ route('paymentgeteway.manage') }}"><i data-feather="file-plus"></i>
+                                                    Payment Gateway</a>
+                                            </li>
+                                        @endcan
+                                        @can('smsgateway-list')
+                                            <li>
+                                                <a href="{{ route('smsgeteway.manage') }}"><i data-feather="file-plus"></i>
+                                                    SMS Gateway</a>
+                                            </li>
+                                        @endcan
+                                        @can('courierapi-list')
+                                            <li>
+                                                <a href="{{ route('courierapi.manage') }}"><i data-feather="file-plus"></i>
+                                                    Courier API</a>
+                                            </li>
+                                        @endcan
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- nav items end -->
+                        @endcan
                         <li>
                             <a href="#sidebar-pixel-gtm" data-bs-toggle="collapse">
                                 <i data-feather="save"></i>
@@ -515,10 +521,12 @@
                             </a>
                             <div class="collapse" id="siebar-sitesetting">
                                 <ul class="nav-second-level">
+                                    @can('setting-list')
                                     <li>
                                         <a href="{{ route('settings.index') }}"><i data-feather="file-plus"></i>
                                             General Setting</a>
                                     </li>
+                                    @endcan
                                     <li>
                                         <a href="{{ route('features.index') }}"><i data-feather="file-plus"></i>
                                             Features</a>
@@ -531,17 +539,19 @@
                                         <a href="{{ route('socialmedias.index') }}"><i data-feather="file-plus"></i>
                                             Social Media</a>
                                     </li>
+                                    @can('contact-list')
                                     <li>
                                         <a href="{{ route('contact.index') }}"><i data-feather="file-plus"></i>
                                             Contact</a>
                                     </li>
+                                    @endcan
                                     <li>
                                         <a href="{{ route('pages.index') }}"><i data-feather="file-plus"></i> Create
                                             Page</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('shippingcharges.index') }}"><i
-                                                data-feather="file-plus"></i> Shipping Charge</a>
+                                        <a href="{{ route('shippingcharges.index') }}"><i data-feather="file-plus"></i>
+                                            Shipping Charge</a>
                                     </li>
                                     <li>
                                         <a href="{{ route('orderstatus.index') }}"><i data-feather="file-plus"></i>
@@ -565,8 +575,8 @@
                             <div class="collapse" id="siebar-banner">
                                 <ul class="nav-second-level">
                                     <li>
-                                        <a href="{{ route('banner_category.index') }}"><i
-                                                data-feather="file-plus"></i> Banner Category</a>
+                                        <a href="{{ route('banner_category.index') }}"><i data-feather="file-plus"></i>
+                                            Banner Category</a>
                                     </li>
                                     <li>
                                         <a href="{{ route('banners.index') }}"><i data-feather="file-plus"></i>
@@ -618,8 +628,8 @@
                                             Sales Reports</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('admin.expense_report') }}"><i
-                                                data-feather="file-plus"></i> Expense Reports</a>
+                                        <a href="{{ route('admin.expense_report') }}"><i data-feather="file-plus"></i>
+                                            Expense Reports</a>
                                     </li>
                                     <li>
                                         <a href="{{ route('admin.loss_profit') }}"><i data-feather="file-plus"></i>
@@ -826,8 +836,8 @@
 
                         <div class="d-grid mt-4">
                             <button class="btn btn-primary" id="resetBtn">Reset to Default</button>
-                            <a href="https://1.envato.market/uboldadmin" class="btn btn-danger mt-3"
-                                target="_blank"><i class="mdi mdi-basket me-1"></i> Purchase Now</a>
+                            <a href="https://1.envato.market/uboldadmin" class="btn btn-danger mt-3" target="_blank"><i
+                                    class="mdi mdi-basket me-1"></i> Purchase Now</a>
                         </div>
                     </div>
                 </div>
@@ -849,7 +859,7 @@
     {!! Toastr::message() !!}
     <script src="{{ asset('public/backEnd/') }}/assets/js/sweetalert.min.js"></script>
     <script type="text/javascript">
-        $(".delete-confirm").click(function(event) {
+        $(".delete-confirm").click(function (event) {
             var form = $(this).closest("form");
             event.preventDefault();
             swal({
@@ -864,7 +874,7 @@
                 }
             });
         });
-        $(".change-confirm").click(function(event) {
+        $(".change-confirm").click(function (event) {
             var form = $(this).closest("form");
             event.preventDefault();
             swal({
@@ -881,18 +891,18 @@
     </script>
     <!--patho courier-->
     <script type="text/javascript">
-        $(document).ready(function() {
-            $('.pathaocity').change(function() {
+        $(document).ready(function () {
+            $('.pathaocity').change(function () {
                 var id = $(this).val();
                 if (id) {
                     $.ajax({
                         type: "GET",
                         url: "{{ url('admin/pathao-city') }}?city_id=" + id,
-                        success: function(res) {
+                        success: function (res) {
                             if (res && res.data && res.data.data) {
                                 $(".pathaozone").empty();
                                 $(".pathaozone").append('<option value="">Select..</option>');
-                                $.each(res.data.data, function(index, zone) {
+                                $.each(res.data.data, function (index, zone) {
                                     $(".pathaozone").append('<option value="' + zone
                                         .zone_id + '">' + zone.zone_name +
                                         '</option>');
@@ -912,18 +922,18 @@
         });
     </script>
     <script type="text/javascript">
-        $(document).ready(function() {
-            $('.pathaozone').change(function() {
+        $(document).ready(function () {
+            $('.pathaozone').change(function () {
                 var id = $(this).val();
                 if (id) {
                     $.ajax({
                         type: "GET",
                         url: "{{ url('admin/pathao-zone') }}?zone_id=" + id,
-                        success: function(res) {
+                        success: function (res) {
                             if (res && res.data && res.data.data) {
                                 $(".pathaoarea").empty();
                                 $(".pathaoarea").append('<option value="">Select..</option>');
-                                $.each(res.data.data, function(index, area) {
+                                $.each(res.data.data, function (index, area) {
                                     $(".pathaoarea").append('<option value="' + area
                                         .area_id + '">' + area.area_name +
                                         '</option>');
@@ -941,7 +951,7 @@
         });
     </script>
     <script>
-        $(".search_click").on("keyup change", function() {
+        $(".search_click").on("keyup change", function () {
             var keyword = $(this).val();
             $.ajax({
                 type: "GET",
@@ -949,7 +959,7 @@
                     keyword: keyword
                 },
                 url: "{{ route('admin.livesearch') }}",
-                success: function(products) {
+                success: function (products) {
                     if (products) {
                         $(".search_result").html(products);
                     } else {
