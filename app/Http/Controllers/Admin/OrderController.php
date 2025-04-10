@@ -138,7 +138,6 @@ class OrderController extends Controller
 
     public function order_pathao(Request $request)
     {
-
         $order = Order::with('shipping')->find($request->id);
         $order_count = OrderDetails::select('order_id')->where('order_id', $order->id)->count();
         // pathao
@@ -400,7 +399,6 @@ class OrderController extends Controller
                 }
             }
 
-
             $data = [
                 'email' => $this->contact()->hotmail,
                 'order_id' => $order->id,
@@ -586,7 +584,6 @@ class OrderController extends Controller
                     } catch (\Exception $e) {
                         Toastr::error('Email not sent', 'Failed');
                     }
-
                 }
             }
         }
@@ -1010,6 +1007,13 @@ class OrderController extends Controller
         $shipping = $request->area ?? 0;
         Session::put('pos_shipping', $shipping);
         return response()->json($shipping);
+    }
+    public function shipping_charge(Request $request)
+    {
+        $shippingCharge = ShippingCharge::where('id', $request->shipping_charge)->first();
+        $shipping_charge = $shippingCharge->amount ?? 0;
+        Session::put('pos_shipping', $shipping_charge);
+        return response()->json($shipping_charge);
     }
 
     public function cart_clear(Request $request)

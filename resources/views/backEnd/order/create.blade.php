@@ -173,6 +173,22 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
+                                        <div class="form-group">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <div class="form-group">
+                                            <label for="" class="form-label">Shipping </label>
+                                            <select name="shipping_charge" id="shipping_charge" class="form-control form-select">
+                                                <option value="">Select Payment Method</option>
+                                                @foreach ($shippingcharge as $shipping)
+                                                    <option value="{{ $shipping->id }}">
+                                                        {{ $shipping->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
                                         <div class="form-group mb-3">
                                             <label for="area" class="form-label">Shipping Fee *</label>
                                             <input type="number" placeholder="Shipping Fee" id="area"
@@ -186,9 +202,7 @@
                                         </div>
                                     </div>
                                     <!-- col-end -->
-
                                 </div>
-
                             </div>
                             <!-- cart total -->
                             <div class="col-sm-6">
@@ -568,6 +582,27 @@
         }, 1500);
 
         $(document).on("input", "#area", debouncedShippingAmount);
+
+        // pshippingfee from total
+        $(document).on("change", "#shipping_charge", function(e) {
+            e.preventDefault();
+            var shipping_charge = $('#shipping_charge').val();
+            $.ajax({
+                type: "GET",
+                data: {
+                    shipping_charge: shipping_charge
+                },
+                url: "{{ route('admin.order.shipping_charge') }}",
+                dataType: "html",
+                success: function(shipping_charge) {
+                    $('#area').val(shipping_charge);
+                    return cart_content() + cart_details();
+                },
+                error: function() {
+                    alert('Error occurred while updating shipping fee');
+                }
+            });
+        });
 
         const debouncedUpdatedQuantity = debounce(function(e) {
             e.preventDefault();

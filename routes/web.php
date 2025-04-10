@@ -487,6 +487,7 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::get('order/cart-product-price', [OrderController::class, 'product_price'])->name('admin.order.product_price');
     Route::get('order/cart-details', [OrderController::class, 'cart_details'])->name('admin.order.cart_details');
     Route::get('order/cart-shipping', [OrderController::class, 'cart_shipping'])->name('admin.order.cart_shipping');
+    Route::get('order/shipping-charge', [OrderController::class, 'shipping_charge'])->name('admin.order.shipping_charge');
     Route::post('order/cart-clear', [OrderController::class, 'cart_clear'])->name('admin.order.cart_clear');
     Route::get('order/paid', [OrderController::class, 'order_paid'])->name('admin.order.paid');
     Route::post('order/customer', [OrderController::class, 'find_customer'])->name('admin.order.customer');
