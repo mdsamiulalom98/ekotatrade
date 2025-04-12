@@ -640,7 +640,11 @@
                 url: "{{ route('admin.order.shipping_charge') }}",
                 dataType: "html",
                 success: function(shipping_charge) {
-                    $('#area').val(shipping_charge);
+                    const charge = parseInt(shipping_charge);
+                    if (!isNaN(charge)) {
+                        console.log(charge);
+                        $('#area').val(charge);
+                    }
                     return cart_content() + cart_details();
                 },
                 error: function() {

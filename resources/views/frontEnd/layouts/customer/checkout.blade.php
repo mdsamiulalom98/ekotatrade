@@ -198,7 +198,8 @@
             </div>
         </div>
     </section>
-@endsection @push('script')
+@endsection
+@push('script')
     <script src="{{ asset('public/frontEnd/') }}/js/parsley.min.js"></script>
     <script src="{{ asset('public/frontEnd/') }}/js/form-validation.init.js"></script>
     <script src="{{ asset('public/frontEnd/') }}/js/select2.min.js"></script>
@@ -272,7 +273,7 @@
             ecommerce: {
                 items: [
                     @foreach (Cart::instance('shopping')->content() as $cartInfo)
-                                {
+                                    {
                         item_name: "{{ $cartInfo->name }}",
                         item_id: "{{ $cartInfo->id }}",
                         price: "{{ $cartInfo->price }}",
@@ -282,9 +283,9 @@
                         item_color: "{{ $cartInfo->options->color }}",
                         currency: "BDT",
                         quantity: {{ $cartInfo->qty ?? 0 }}
-                                },
+                                    },
                     @endforeach
-                        ]
+                            ]
             }
         });
     </script>
@@ -300,7 +301,7 @@
             ecommerce: {
                 items: [
                     @foreach (Cart::instance('shopping')->content() as $cartInfo)
-                                {
+                                    {
                         item_name: "{{ $cartInfo->name }}",
                         item_id: "{{ $cartInfo->id }}",
                         price: "{{ $cartInfo->price }}",
@@ -310,9 +311,9 @@
                         item_color: "{{ $cartInfo->options->color }}",
                         currency: "BDT",
                         quantity: {{ $cartInfo->qty ?? 0 }}
-                                },
+                                    },
                     @endforeach
-                        ]
+                            ]
             }
         });
     </script>

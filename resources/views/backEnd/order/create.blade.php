@@ -76,47 +76,47 @@
                                     <tbody id="cartTable">
                                         @php $product_discount = 0; @endphp
                                         @foreach ($cartinfo as $key => $value)
-                                            <tr>
-                                                <td><img height="30" src="{{ asset($value->options->image) }}" /></td>
-                                                <td>{{ $value->name }}
-                                                    @if ($value->options->product_size)
-                                                        <p>Size: {{ $value->options->product_size }}</p>
-                                                    @endif
-                                                    @if ($value->options->product_color)
-                                                        <p>Color: {{ $value->options->product_color }}</p>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <div class="qty-cart vcart-qty">
-                                                        <div class="quantity">
-                                                            <button type="button" class="minus cart_decrement"
-                                                                value="{{ $value->qty }}"
-                                                                data-id="{{ $value->rowId }}">-</button>
-                                                            <input type="number" value="{{ $value->qty }}"
-                                                                class="quantity_update" data-id="{{ $value->rowId }}" />
-                                                            <button type="button" class="plus cart_increment"
-                                                                value="{{ $value->qty }}"
-                                                                data-id="{{ $value->rowId }}">+</button>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="discount"><input type="number" class="product_price"
-                                                        value="{{ $value->price }}" placeholder="0.00"
-                                                        data-id="{{ $value->rowId }}" /></td>
-                                                <td class="discount"><input type="number" class="product_discount"
-                                                        value="{{ $value->options->product_discount }}" placeholder="0.00"
-                                                        data-id="{{ $value->rowId }}" /></td>
-                                                <td>{{ ($value->price - $value->options->product_discount) * $value->qty }}
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-xs cart_remove"
-                                                        data-id="{{ $value->rowId }}"><i class="fa fa-times"></i></button>
-                                                </td>
-                                            </tr>
-                                            @php
-                                                $product_discount += $value->options->product_discount * $value->qty;
-                                                Session::put('product_discount', $product_discount);
-                                            @endphp
+                                                                            <tr>
+                                                                                <td><img height="30" src="{{ asset($value->options->image) }}" /></td>
+                                                                                <td>{{ $value->name }}
+                                                                                    @if ($value->options->product_size)
+                                                                                        <p>Size: {{ $value->options->product_size }}</p>
+                                                                                    @endif
+                                                                                    @if ($value->options->product_color)
+                                                                                        <p>Color: {{ $value->options->product_color }}</p>
+                                                                                    @endif
+                                                                                </td>
+                                                                                <td>
+                                                                                    <div class="qty-cart vcart-qty">
+                                                                                        <div class="quantity">
+                                                                                            <button type="button" class="minus cart_decrement"
+                                                                                                value="{{ $value->qty }}"
+                                                                                                data-id="{{ $value->rowId }}">-</button>
+                                                                                            <input type="number" value="{{ $value->qty }}"
+                                                                                                class="quantity_update" data-id="{{ $value->rowId }}" />
+                                                                                            <button type="button" class="plus cart_increment"
+                                                                                                value="{{ $value->qty }}"
+                                                                                                data-id="{{ $value->rowId }}">+</button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td class="discount"><input type="number" class="product_price"
+                                                                                        value="{{ $value->price }}" placeholder="0.00"
+                                                                                        data-id="{{ $value->rowId }}" /></td>
+                                                                                <td class="discount"><input type="number" class="product_discount"
+                                                                                        value="{{ $value->options->product_discount }}" placeholder="0.00"
+                                                                                        data-id="{{ $value->rowId }}" /></td>
+                                                                                <td>{{ ($value->price - $value->options->product_discount) * $value->qty }}
+                                                                                </td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-danger btn-xs cart_remove"
+                                                                                        data-id="{{ $value->rowId }}"><i class="fa fa-times"></i></button>
+                                                                                </td>
+                                                                            </tr>
+                                                                            @php
+                                                                                $product_discount += $value->options->product_discount * $value->qty;
+                                                                                Session::put('product_discount', $product_discount);
+                                                                            @endphp
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -179,11 +179,13 @@
                                     <div class="col-sm-6 mb-3">
                                         <div class="form-group">
                                             <label for="" class="form-label">Shipping </label>
-                                            <select name="shipping_charge" id="shipping_charge" class="form-control form-select">
+                                            <select name="shipping_charge" id="shipping_charge"
+                                                class="form-control form-select">
                                                 <option value="">Select Payment Method</option>
                                                 @foreach ($shippingcharge as $shipping)
                                                     <option value="{{ $shipping->id }}">
-                                                        {{ $shipping->name }}</option>
+                                                        {{ $shipping->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -252,7 +254,8 @@
                                                         <option value="">Select Payment Method</option>
                                                         @foreach ($paymentmethods as $paymentmethod)
                                                             <option value="{{ $paymentmethod->name }}">
-                                                                {{ $paymentmethod->name }}</option>
+                                                                {{ $paymentmethod->name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -260,8 +263,8 @@
                                             <!-- col-end -->
                                             <div class="col-sm-3">
                                                 <div class="form-group">
-                                                    <input type="number" name="amount[]"
-                                                        class="form-control payment_amount" placeholder="Amount">
+                                                    <input type="number" name="amount[]" class="form-control payment_amount"
+                                                        placeholder="Amount">
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
@@ -292,7 +295,8 @@
                                                     <option value="">Select Payment Method</option>
                                                     @foreach ($paymentmethods as $paymentmethod)
                                                         <option value="{{ $paymentmethod->name }}">
-                                                            {{ $paymentmethod->name }}</option>
+                                                            {{ $paymentmethod->name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -312,9 +316,8 @@
                                         </div>
                                         <div class="col-sm-3">
                                             <div class="form-group">
-                                                <input type="text" name="sender_number[]"
-                                                    value="{{ old('sender_number') }}" class="form-control"
-                                                    placeholder="Sender Number">
+                                                <input type="text" name="sender_number[]" value="{{ old('sender_number') }}"
+                                                    class="form-control" placeholder="Sender Number">
                                             </div>
                                         </div>
                                     </div>
@@ -359,7 +362,7 @@
     </script>
 
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.select2').select2();
         });
     </script>
@@ -369,10 +372,10 @@
                 type: "GET",
                 url: "{{ route('admin.order.cart_content') }}",
                 dataType: "html",
-                success: function(cartinfo) {
+                success: function (cartinfo) {
                     $('#cartTable').html(cartinfo);
                 },
-                error: function() {
+                error: function () {
                     alert('Error occurred while updating cart content');
                 }
             });
@@ -383,10 +386,10 @@
                 type: "GET",
                 url: "{{ route('admin.order.cart_details') }}",
                 dataType: "html",
-                success: function(cartinfo) {
+                success: function (cartinfo) {
                     $('#cart_details').html(cartinfo);
                 },
-                error: function() {
+                error: function () {
                     alert('Error occurred while updating cart details');
                 }
             });
@@ -400,7 +403,7 @@
                     keyword: keyword
                 },
                 url: "{{ route('admin.livesearch') }}",
-                success: function(products) {
+                success: function (products) {
                     if (products) {
                         $(".search_result").html(products);
                     } else {
@@ -410,7 +413,7 @@
             });
         }
 
-        $('.cart_add').on('click', function(e) {
+        $('.cart_add').on('click', function (e) {
             var id = $(this).data('id');
             if (id) {
                 $.ajax({
@@ -421,16 +424,16 @@
                     },
                     url: "{{ route('admin.order.cart_add') }}",
                     dataType: "json",
-                    success: function(cartinfo) {
+                    success: function (cartinfo) {
                         return cart_content() + cart_details() + search_clear();
                     },
-                    error: function() {
+                    error: function () {
                         alert('Error occurred while adding product to cart');
                     }
                 });
             }
         });
-        $(document).on('click', '.cart_increment', function(e) {
+        $(document).on('click', '.cart_increment', function (e) {
             e.preventDefault();
             var id = $(this).data('id');
             var qty = $(this).val();
@@ -444,16 +447,16 @@
                     type: "GET",
                     url: "{{ route('admin.order.cart_increment') }}",
                     dataType: "json",
-                    success: function(cartinfo) {
+                    success: function (cartinfo) {
                         return cart_content() + cart_details();
                     },
-                    error: function() {
+                    error: function () {
                         alert('Error occurred while incrementing cart item.');
                     }
                 });
             }
         });
-        $(document).on('click', '.cart_decrement', function(e) {
+        $(document).on('click', '.cart_decrement', function (e) {
             e.preventDefault();
             var id = $(this).data('id');
             var qty = $(this).val();
@@ -467,10 +470,10 @@
                     },
                     url: "{{ route('admin.order.cart_decrement') }}",
                     dataType: "json",
-                    success: function(cartinfo) {
+                    success: function (cartinfo) {
                         return cart_content() + cart_details();
                     },
-                    error: function() {
+                    error: function () {
                         alert('Error occurred while decrementing cart item.');
                     }
                 });
@@ -478,12 +481,12 @@
         });
 
         // Prevent form submission on Enter key press in quantity_update input
-        $(document).on("keypress", ".quantity_update", function(e) {
+        $(document).on("keypress", ".quantity_update", function (e) {
             if (e.which === 13) {
                 e.preventDefault();
             }
         });
-        $(document).on("click", ".cart_remove", function(e) {
+        $(document).on("click", ".cart_remove", function (e) {
             e.preventDefault();
             var id = $(this).data("id");
             if (id) {
@@ -495,10 +498,10 @@
                     },
                     url: "{{ route('admin.order.cart_remove') }}",
                     dataType: "json",
-                    success: function(cartinfo) {
+                    success: function (cartinfo) {
                         return cart_content() + cart_details();
                     },
-                    error: function() {
+                    error: function () {
                         alert('Error occurred while removing cart item.');
                     }
                 });
@@ -508,14 +511,14 @@
         // Debounce function to delay execution
         function debounce(func, wait) {
             let timeout;
-            return function(...args) {
+            return function (...args) {
                 clearTimeout(timeout);
                 timeout = setTimeout(() => func.apply(this, args), wait);
             };
         }
 
         // Debounced function for product price input
-        const debouncedDiscountPrice = debounce(function(e) {
+        const debouncedDiscountPrice = debounce(function (e) {
             e.preventDefault();
             var id = $(this).data("id");
             var discount = $(this).val();
@@ -528,11 +531,11 @@
                 },
                 url: "{{ route('admin.order.product_discount') }}",
                 dataType: "json",
-                success: function(cartinfo) {
+                success: function (cartinfo) {
                     cart_content();
                     cart_details();
                 },
-                error: function() {
+                error: function () {
                     alert('Error occurred while updating product price');
                 }
             });
@@ -540,7 +543,7 @@
 
         $(document).on("input", ".product_discount", debouncedDiscountPrice);
 
-        const debouncedProductPrice = debounce(function(e) {
+        const debouncedProductPrice = debounce(function (e) {
             e.preventDefault();
             var id = $(this).data("id");
             var price = $(this).val();
@@ -553,7 +556,7 @@
                 },
                 url: "{{ route('admin.order.product_price') }}",
                 dataType: "json",
-                success: function(cartinfo) {
+                success: function (cartinfo) {
                     return cart_content() + cart_details();
                 },
             });
@@ -562,7 +565,7 @@
         $(document).on("input", ".product_price", debouncedProductPrice);
 
         // pshippingfee from total
-        const debouncedShippingAmount = debounce(function(e) {
+        const debouncedShippingAmount = debounce(function (e) {
             e.preventDefault();
             var area = $('#area').val();
             $.ajax({
@@ -572,10 +575,10 @@
                 },
                 url: "{{ route('admin.order.cart_shipping') }}",
                 dataType: "html",
-                success: function(cartinfo) {
+                success: function (cartinfo) {
                     return cart_content() + cart_details();
                 },
-                error: function() {
+                error: function () {
                     alert('Error occurred while updating shipping fee');
                 }
             });
@@ -584,7 +587,7 @@
         $(document).on("input", "#area", debouncedShippingAmount);
 
         // pshippingfee from total
-        $(document).on("change", "#shipping_charge", function(e) {
+        $(document).on("change", "#shipping_charge", function (e) {
             e.preventDefault();
             var shipping_charge = $('#shipping_charge').val();
             $.ajax({
@@ -594,17 +597,21 @@
                 },
                 url: "{{ route('admin.order.shipping_charge') }}",
                 dataType: "html",
-                success: function(shipping_charge) {
-                    $('#area').val(shipping_charge);
+                success: function (shipping_charge) {
+                    const charge = parseInt(shipping_charge);
+                    if (!isNaN(charge)) {
+                        console.log(charge);
+                        $('#area').val(charge);
+                    }
                     return cart_content() + cart_details();
                 },
-                error: function() {
+                error: function () {
                     alert('Error occurred while updating shipping fee');
                 }
             });
         });
 
-        const debouncedUpdatedQuantity = debounce(function(e) {
+        const debouncedUpdatedQuantity = debounce(function (e) {
             e.preventDefault();
             var id = $(this).data("id");
             var qty = $(this).val();
@@ -618,7 +625,7 @@
                     },
                     url: "{{ route('admin.order.quantity_update') }}",
                     dataType: "json",
-                    success: function(cartinfo) {
+                    success: function (cartinfo) {
                         return cart_content() + cart_details();
                     },
                 });
@@ -628,7 +635,7 @@
         $(document).on("input", ".quantity_update", debouncedUpdatedQuantity);
 
         // customer details
-        const debouncedCustomerPhone = debounce(function(e) {
+        const debouncedCustomerPhone = debounce(function (e) {
             e.preventDefault();
             console.log('working');
             var phoneNumber = $('#phone').val();
@@ -641,13 +648,13 @@
                         _token: "{{ csrf_token() }}",
                         phone: phoneNumber
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.status == 'success') {
                             $('#name').val(response.customer.name);
                             $('#address').val(response.customer.address);
                         }
                     },
-                    error: function() {
+                    error: function () {
                         // Handle error if needed
                         alert('Error occurred while fetching the response');
                     }
@@ -658,28 +665,28 @@
 
         $(document).on('input', '#phone', debouncedCustomerPhone);
 
-        $(".cartclear").click(function(e) {
+        $(".cartclear").click(function (e) {
             $.ajax({
                 cache: false,
                 type: "GET",
                 url: "{{ route('admin.order.cart_clear') }}",
                 dataType: "json",
-                success: function(cartinfo) {
+                success: function (cartinfo) {
                     return cart_content() + cart_details();
                 },
-                error: function() {
+                error: function () {
                     alert('Error occurred while clearing cart');
                 }
             });
         });
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.search_click').focus();
         });
     </script>
     <script>
-        $(document).ready(function() {
-            $('#guest_customer').change(function() {
+        $(document).ready(function () {
+            $('#guest_customer').change(function () {
                 if ($(this).is(':checked')) {
                     $('.new_customer').hide();
                 } else {
@@ -691,18 +698,18 @@
 
 
     <script type="text/javascript">
-        $(document).ready(function() {
-            $(".btn-increment").click(function() {
+        $(document).ready(function () {
+            $(".btn-increment").click(function () {
                 var html = $(".clone").html();
                 $(".increment").after(html);
             });
-            $("body").on("click", ".btn-danger", function() {
+            $("body").on("click", ".btn-danger", function () {
                 $(this).parents(".control-group").remove();
             });
 
             function calculateTotal() {
                 let total = 0;
-                $(".payment_amount").each(function() {
+                $(".payment_amount").each(function () {
                     let value = parseFloat($(this).val()) || 0; // Convert to number, ignore empty fields
                     total += value;
                 });
@@ -717,16 +724,16 @@
                     },
                     url: "{{ route('admin.order.paid') }}",
                     dataType: "json",
-                    success: function(cartinfo) {
+                    success: function (cartinfo) {
                         return cart_content() + cart_details();
                     }
                 });
             }
 
             let timer;
-            $(document).on("input", ".payment_amount", function() {
+            $(document).on("input", ".payment_amount", function () {
                 clearTimeout(timer);
-                timer = setTimeout(function() {
+                timer = setTimeout(function () {
                     calculateTotal();
                 }, 1000);
             });

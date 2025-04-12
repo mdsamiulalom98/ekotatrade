@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Brian2694\Toastr\Facades\Toastr;
@@ -43,6 +44,7 @@ class OrderController extends Controller
         $this->middleware('permission:order-process', ['only' => ['process', 'order_process']]);
         $this->middleware('permission:order-process', ['only' => ['process']]);
         $this->middleware('permission:order-view', ['only' => ['invoice']]);
+        $this->middleware('permission:order-trashed', ['only' => ['trashed_orders']]);
     }
     private function contact()
     {
@@ -77,9 +79,9 @@ class OrderController extends Controller
         if ($slug == 'all') {
             $order_status = (object) [
                 'name' => 'All',
-                'orders_count' => Order::count(),
+                'orders_count' => Order::where('is_trashed', NULL)->count(),
             ];
-            $show_data = Order::latest()->with('shipping', 'status');
+            $show_data = Order::where('is_trashed', NULL)->latest()->with('shipping', 'status');
             if ($request->keyword) {
                 $show_data = $show_data->where(function ($query) use ($request) {
                     $query->orWhere('invoice_id', 'LIKE', '%' . $request->keyword . '%')
@@ -91,7 +93,7 @@ class OrderController extends Controller
             $show_data = $show_data->paginate(50);
         } else {
             $order_status = OrderStatus::where('slug', $slug)->withCount('orders')->first();
-            $show_data = Order::where(['order_status' => $order_status->id])->latest()->with('shipping', 'status')->paginate(50);
+            $show_data = Order::where(['order_status' => $order_status->id])->where('is_trashed', NULL)->latest()->with('shipping', 'status')->paginate(50);
         }
         $users = User::get();
         $steadfast = Courierapi::where(['status' => 1, 'type' => 'steadfast'])->first();
@@ -110,6 +112,14 @@ class OrderController extends Controller
             $pathaostore = [];
         }
         return view('backEnd.order.index', compact('show_data', 'order_status', 'users', 'steadfast', 'pathaostore', 'pathaocities'));
+    }
+    public function trashed_orders(Request $request)
+    {
+        $show_data = Order::where('is_trashed', 1)->latest()->with('shipping', 'status')->paginate(50);
+        $orders = Order::where('is_trashed', 1)->latest()->with('shipping', 'status')->get();
+        $users = User::get();
+
+        return view('backEnd.order.trashed', compact('show_data', 'users', 'orders'));
     }
 
     public function pathaocity(Request $request)
@@ -176,6 +186,185 @@ class OrderController extends Controller
             Toastr::error($response['message'], 'Courier Order Faild');
             return redirect()->back();
         }
+    }
+
+    public function auto_status_update(){
+        // steadfast auto update start
+        $orders = Order::select('id','courier_tracker','courier','order_status')->whereNotNull('courier_tracker')
+            ->where('courier', 'steadfast')
+            ->whereNotIn('order_status', [1, 2, 9, 10,11,12])
+            ->get();
+
+        if($orders->count() > 0){
+            $courier_info = Courierapi::where(['status' => 1, 'type' => 'steadfast'])->first();
+            $responses = Http::pool(function ($pool) use ($orders, $courier_info) {
+                $requests = [];
+                foreach ($orders as $order) {
+                    $requests[] = $pool->withHeaders([
+                        'Api-Key' => $courier_info->api_key,
+                        'Secret-Key' => $courier_info->secret_key,
+                        'Accept' => 'application/json',
+                    ])->get('https://portal.steadfast.com.bd/api/v1/status_by_cid/' . $order->courier_tracker);
+                }
+                return $requests;
+            });
+
+            foreach ($orders as $index => $order) {
+                $responseData = $responses[$index]->json();
+                if ($responseData['status'] == 200) {
+
+                    $courier_status = $responseData['delivery_status'] ?? 'unknown';
+                    if ($courier_status !== "unknown") {
+                        $orderstatus = Orderstatus::where('slug', $courier_status)->first();
+                        if ($orderstatus) {
+                            if ($orderstatus->id == 10 && $porder != 10) {
+                                $orders_details = OrderDetails::where('order_id', $order->id)->get();
+                                // return  $orders_details;
+                                foreach ($orders_details as $order_detail) {
+                                    if ($order_detail->product_type == 1) {
+                                        $product = Product::select('id','stock')->find($order_detail->product_id);
+                                        $product->stock -= $order_detail->qty;
+                                        $product->save();
+                                    } else {
+                                        $product = ProductVariable::where(['product_id' => $order_detail->product_id, 'color' => $order_detail->product_color, 'size' => $order_detail->product_size])->first();
+                                        $product->stock -= $order_detail->qty;
+                                        $product->save();
+                                    }
+                                }
+                                $review_link = Product::where('status', 1)->find($order_detail->product_id);
+                                    $site_setting = GeneralSetting::where('status', 1)->first();
+                                    $sms_gateway = SmsGateway::where(['status' => 1, 'order' => '1'])->first();
+                                    if ($sms_gateway) {
+                                        $url = "$sms_gateway->url";
+                                        $data = [
+                                            "api_key" => "$sms_gateway->api_key",
+                                            "contacts" => $request->phone,
+                                            "type" => 'text',
+                                            "senderid" => "$sms_gateway->serderid",
+                                            "msg" => "Dear $request->name!\r\nYour order Delivered has been successful.Review link https://hellodinajpur.com/ecomart/product/$review_link->slug"
+                                        ];
+                                        $ch = curl_init();
+                                        curl_setopt($ch, CURLOPT_URL, $url);
+                                        curl_setopt($ch, CURLOPT_POST, 1);
+                                        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                                        $response = curl_exec($ch);
+                                        curl_close($ch);
+                                    }
+
+                            }
+                            if ($orderstatus->id == 12 && $porder != 12) {
+                                $orders_details = OrderDetails::where('order_id', $order->id)->get();
+                                // return  $orders_details;
+                                foreach ($orders_details as $order_detail) {
+                                    if ($order_detail->product_type == 1) {
+                                        $product = Product::select('id','stock')->find($order_detail->product_id);
+                                        $product->stock += $order_detail->qty;
+                                        $product->save();
+                                    } else {
+                                        $product = ProductVariable::where(['product_id' => $order_detail->product_id, 'color' => $order_detail->product_color, 'size' => $order_detail->product_size])->first();
+                                        $product->stock += $order_detail->qty;
+                                        $product->save();
+                                    }
+                                }
+
+                            }
+                            Order::select('id','courier_tracker','courier','order_status')->where('id', $order->id)->update(['order_status' => $orderstatus->id]);
+                        }
+                    }
+                }
+            }
+        }
+        // steadfast auto update start
+
+        // Pathao auto update start
+        $porders = Order::select('id','courier_tracker','courier','order_status')->whereNotNull('courier_tracker')
+            ->where('courier', 'pathao')
+            ->whereNotIn('order_status', [1, 2, 9, 10, 11, 12])
+            ->get();
+
+        if($porders->count() > 0){
+            $pcourier_info = Courierapi::where(['status' => 1, 'type' => 'pathao'])->first();
+            $presponses = Http::pool(function ($pool) use ($porders, $pcourier_info) {
+                $requests = [];
+                foreach ($porders as $porder) {
+                    $requests[] = $pool->withHeaders([
+                        'Authorization' => 'Bearer ' . $pcourier_info->token,
+                        'Content-Type' => 'application/json',
+                    ])->get($pcourier_info->url.'/api/v1/orders/'.$porder->courier_tracker.'/info');
+                }
+                return $requests;
+            });
+
+            foreach ($porders as $index => $porder) {
+                if (isset($presponses[$index]) && $presponses[$index]->successful()) {
+                    $presponseData = $presponses[$index]->json();
+                    $pcourier_status = $presponseData['data']['order_status'];
+                    if ($pcourier_status == "Pickup Cancelled" || $pcourier_status == "Pickup"|| $pcourier_status == "In Transit"|| $pcourier_status == "On Hold"
+                    || $pcourier_status == "Delivered"|| $pcourier_status == "Partial Delivery"|| $pcourier_status == "Return") {
+                        $porderstatus = Orderstatus::where('name', $pcourier_status)->first();
+
+                        if ($porderstatus) {
+                            if ($porderstatus->id == 6 && $porder != 6) {
+                                $orders_details = OrderDetails::where('order_id', $order->id)->get();
+                                foreach ($orders_details as $order_detail) {
+                                    if ($order_detail->product_type == 1) {
+                                        $product = Product::select('id','stock')->find($order_detail->product_id);
+                                        $product->stock -= $order_detail->qty;
+                                        $product->save();
+                                    } else {
+                                        $product = ProductVariable::where(['product_id' => $order_detail->product_id, 'color' => $order_detail->product_color, 'size' => $order_detail->product_size])->first();
+                                        $product->stock -= $order_detail->qty;
+                                        $product->save();
+                                    }
+                                }
+                                $review_link = Product::where('status', 1)->find($order_detail->product_id);
+                                    $site_setting = GeneralSetting::where('status', 1)->first();
+                                    $sms_gateway = SmsGateway::where(['status' => 1, 'order' => '1'])->first();
+                                    if ($sms_gateway) {
+                                        $url = "$sms_gateway->url";
+                                        $data = [
+                                            "api_key" => "$sms_gateway->api_key",
+                                            "contacts" => $request->phone,
+                                            "type" => 'text',
+                                            "senderid" => "$sms_gateway->serderid",
+                                            "msg" => "Dear $request->name!\r\nYour order Delivered has been successful.Review link https://hellodinajpur.com/ecomart/product/$review_link->slug"
+                                        ];
+                                        $ch = curl_init();
+                                        curl_setopt($ch, CURLOPT_URL, $url);
+                                        curl_setopt($ch, CURLOPT_POST, 1);
+                                        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                                        $response = curl_exec($ch);
+                                        curl_close($ch);
+                                    }
+
+                            }
+                            if ($porderstatus->id == 7 && $porder != 7) {
+                                $orders_details = OrderDetails::where('order_id', $order->id)->get();
+                                foreach ($orders_details as $order_detail) {
+                                    if ($order_detail->product_type == 1) {
+                                        $product = Product::select('id','stock')->find($order_detail->product_id);
+                                        $product->stock += $order_detail->qty;
+                                        $product->save();
+                                    } else {
+                                        $product = ProductVariable::where(['product_id' => $order_detail->product_id, 'color' => $order_detail->product_color, 'size' => $order_detail->product_size])->first();
+                                        $product->stock += $order_detail->qty;
+                                        $product->save();
+                                    }
+                                }
+                            }
+                            Order::select('id','courier_tracker','courier','order_status')->where('id', $porder->id)->update(['order_status' => $porderstatus->id]);
+                        }
+                    }
+                }
+            }
+        }
+
+        Toastr::success('Courier parcel auto update successfully', 'Success!');
+        return back();
     }
 
     public function invoice($id)
@@ -344,7 +533,6 @@ class OrderController extends Controller
                 }
             }
 
-
             $data = [
                 'email' => $this->contact()->hotmail,
                 'order_id' => $order->id,
@@ -423,6 +611,14 @@ class OrderController extends Controller
         OrderDetails::where('order_id', $request->id)->delete();
         Shipping::where('order_id', $request->id)->delete();
         Payment::where('order_id', $request->id)->delete();
+        Toastr::success('Success', 'Order delete success successfully');
+        return redirect()->back();
+    }
+    public function trashed(Request $request)
+    {
+        $order = Order::where('id', $request->id)->first();
+        $order->is_trashed = 1;
+        $order->save();
         Toastr::success('Success', 'Order delete success successfully');
         return redirect()->back();
     }
@@ -569,7 +765,6 @@ class OrderController extends Controller
                     curl_close($curl);
                 }
 
-
                 if ($order->shipping->email) {
                     $linkdata = OrderStatus::find($request->order_status)->name;
                     $data = [
@@ -587,6 +782,32 @@ class OrderController extends Controller
                 }
             }
         }
+        if ($request->order_status == 9) {
+            $orders = Order::whereIn('id', $request->input('order_ids'))->get();
+            foreach ($orders as $order) {
+                $sms_gateway = SmsGateway::where('status', 1)->first();
+                if ($sms_gateway) {
+                    $phone = $order->shipping->phone ?? '01611814504';
+                    $customer = $order->shipping->name ?? 'estiak';
+                    $curl = curl_init();
+                    curl_setopt_array(
+                        $curl,
+                        array(
+                            CURLOPT_URL => "$sms_gateway->url",
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_CUSTOMREQUEST => 'POST',
+                            CURLOPT_POSTFIELDS => array(
+                                'api_key' => "$sms_gateway->api_key",
+                                "msg" => "আপনার অর্ডারটি নিশ্চিত করা হয়েছে। ইনভয়েস দেখতে নিচের লিংকটি ভিজিট করুন: \n https://www.ekotatrade.com.bd/customer/invoice?$order->id \n Ekota Trade-এর সাথে থাকার জন্য ধন্যবাদ।",
+                                'to' => $phone,
+                            ),
+                        )
+                    );
+                    $response = curl_exec($curl);
+                    curl_close($curl);
+                }
+            }
+        }
         return response()->json(['status' => 'success', 'message' => 'Order status change successfully']);
     }
 
@@ -598,6 +819,16 @@ class OrderController extends Controller
             OrderDetails::where('order_id', $order_id)->delete();
             Shipping::where('order_id', $order_id)->delete();
             Payment::where('order_id', $order_id)->delete();
+        }
+        return response()->json(['status' => 'success', 'message' => 'Order delete successfully']);
+    }
+    public function bulk_trashed(Request $request)
+    {
+        $orders_id = $request->order_ids;
+        foreach ($orders_id as $order_id) {
+            $order = Order::where('id', $order_id)->first();
+            $order->is_trashed = 1;
+            $order->save();
         }
         return response()->json(['status' => 'success', 'message' => 'Order delete successfully']);
     }
@@ -649,13 +880,13 @@ class OrderController extends Controller
                         $message = 'Your order place to courier failed';
                         $status = 'failed';
                     }
+                    return response()->json(['status' => $status, 'message' => $message]);
                 }
             }
         }
     }
     public function order_create()
     {
-        // Cart::instance('pos_shopping')->destroy();
         Session::put('pos_shipping', 0);
         $products = Product::select('id', 'name', 'new_price', 'product_code')->where(['status' => 1])->get();
         $cartinfo = Cart::instance('pos_shopping')->content()->sortBy('options.sort_order');
@@ -725,7 +956,6 @@ class OrderController extends Controller
             $customer_id = $store->id;
         }
 
-        // order data save
         $order = Order::orderBy('id', 'desc')->first();
         $lastId = $order ? $order->invoice_id + 1 : 10001;
 
@@ -1011,7 +1241,7 @@ class OrderController extends Controller
     public function shipping_charge(Request $request)
     {
         $shippingCharge = ShippingCharge::where('id', $request->shipping_charge)->first();
-        $shipping_charge = $shippingCharge->amount ?? 0;
+        $shipping_charge = (int) ($shippingCharge->amount ?? 0);
         Session::put('pos_shipping', $shipping_charge);
         return response()->json($shipping_charge);
     }
@@ -1358,6 +1588,7 @@ class OrderController extends Controller
     {
         $order_note = new OrderNote();
         $order_note->order_id = request('order_id');
+        $order_note->user_id = Auth::user()->id;
         $order_note->note = request('order_note');
         $order_note->save();
         Toastr::success('Note updated successfully', 'Success!');

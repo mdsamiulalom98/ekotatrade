@@ -313,7 +313,6 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::post('brands/active', [BrandController::class, 'active'])->name('brands.active');
     Route::post('brands/destroy', [BrandController::class, 'destroy'])->name('brands.destroy');
 
-
     // Newsticker
     Route::get('newsticker/manage', [NewstickerController::class, 'index'])->name('newsticker.index');
     Route::get('newsticker/{id}/show', [NewstickerController::class, 'show'])->name('newsticker.show');
@@ -498,6 +497,7 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::get('silip-print', [OrderController::class, 'product_print'])->name('admin.order.product_print');
     // Order route
     Route::get('order/{slug}', [OrderController::class, 'index'])->name('admin.orders');
+    Route::get('trashed-order', [OrderController::class, 'trashed_orders'])->name('admin.orders.trashed');
     Route::get('order/edit/{id}', [OrderController::class, 'order_edit'])->name('admin.order.edit');
     Route::post('order/update', [OrderController::class, 'order_update'])->name('admin.order.update');
     Route::post('order/note/create', [OrderController::class, 'order_note_create'])->name('admin.order.note_create');
@@ -506,9 +506,11 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::get('order/process/{id}', [OrderController::class, 'process'])->name('admin.order.process');
     Route::post('order/change', [OrderController::class, 'order_process'])->name('admin.order_change');
     Route::post('order/destroy', [OrderController::class, 'destroy'])->name('admin.order.destroy');
+    Route::post('order/trashed', [OrderController::class, 'trashed'])->name('admin.order.trashed');
     Route::get('order-assign', [OrderController::class, 'order_assign'])->name('admin.order.assign');
     Route::get('order-status', [OrderController::class, 'order_status'])->name('admin.order.status');
     Route::get('order-bulk-destroy', [OrderController::class, 'bulk_destroy'])->name('admin.order.bulk_destroy');
+    Route::get('order-bulk-trashed', [OrderController::class, 'bulk_trashed'])->name('admin.order.bulk_trashed');
     Route::get('order-print', [OrderController::class, 'order_print'])->name('admin.order.order_print');
 
     Route::get('pos-print', [OrderController::class, 'pos_print'])->name('admin.order.pos_print');
@@ -517,6 +519,7 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['auth', 'lock', 'check_re
     Route::get('order-pathao', [OrderController::class, 'order_pathao'])->name('admin.order.pathao');
     Route::get('pathao-city', [OrderController::class, 'pathaocity'])->name('pathaocity');
     Route::get('pathao-zone', [OrderController::class, 'pathaozone'])->name('pathaozone');
+    Route::post('courier/status_update', [OrderController::class, 'auto_status_update'])->name('admin.courier.status_update');
     Route::get('stock-report', [OrderController::class, 'stock_report'])->name('admin.stock_report');
     Route::get('order-report', [OrderController::class, 'order_report'])->name('admin.order_report');
     Route::get('expense-report', [OrderController::class, 'expense_report'])->name('admin.expense_report');

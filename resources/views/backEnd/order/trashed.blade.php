@@ -1,16 +1,5 @@
 @extends('backEnd.layouts.master')
-@section('title', $order_status->name . ' Order')
-@section('css')
-    <style>
-        .underline {
-            text-decoration: underline;
-        }
-
-        .cursor-pointer {
-            cursor: pointer;
-        }
-    </style>
-@endsection
+@section('title', 'Trashed Order')
 @section('content')
     <div class="container-fluid">
         <!-- start page title -->
@@ -21,7 +10,7 @@
                         <a href="{{ route('admin.order.create') }}" class="btn btn-danger rounded-pill"><i
                                 class="fe-shopping-cart"></i> Add New</a>
                     </div>
-                    <h4 class="page-title">{{ $order_status->name }} Order ({{ $order_status->orders_count }})</h4>
+                    <h4 class="page-title">Trashed Order ({{ $orders->count() }})</h4>
                 </div>
             </div>
         </div>
@@ -45,11 +34,7 @@
                                     <li><a href="{{ route('admin.order.pos_print') }}"
                                             class="btn rounded-pill btn-info multi_pos_print"><i class="fe-printer"></i>
                                             Print Pos</a></li>
-                                    @if ($steadfast)
-                                        <li><a href="{{ route('admin.bulk_courier', 'steadfast') }}"
-                                                class="btn rounded-pill btn-warning multi_order_courier"><i
-                                                    class="fe-truck"></i> SteadFast</a></li>
-                                    @endif
+
                                     @can('order-delete')
                                         <li>
                                             <a href="{{ route('admin.order.bulk_trashed') }}"
@@ -59,11 +44,6 @@
                                             </a>
                                         </li>
                                     @endcan
-                                    <form style="display:inline-block" action="{{route('admin.courier.status_update')}}" method="POST"> @csrf
-                                        <button class="btn rounded-pill btn-success" onclick="return confirm('Are you sure want courier status auto update?')">
-                                            <i class="fe-truck"></i> Courier Update
-                                        </button>
-                                    </form>
                                 </ul>
                             </div>
                             <div class="col-sm-4">
@@ -117,7 +97,7 @@
                                                     <a href="{{ route('admin.order.edit', ['id' => $value->id]) }}"
                                                         title="Edit"><i class="fe-edit"></i></a>
                                                     @can('order-delete')
-                                                        <form method="post" action="{{ route('admin.order.trashed') }}"
+                                                        <form method="post" action="{{ route('admin.order.destroy') }}"
                                                             class="d-inline">
                                                             @csrf
                                                             <input type="hidden" value="{{ $value->id }}" name="id">
@@ -127,14 +107,13 @@
                                                         </form>
                                                     @endcan
                                                     <a data-bs-toggle="modal" data-bs-target="#orderNote" title="Note"
-                                                        class="order_note " data-id="{{ $value->id }}">
+                                                        class="order_note" data-id="{{ $value->id }}">
                                                         <i class="fe-file-text"></i>
                                                     </a>
-                                                    <a data-bs-toggle="modal" data-bs-target="#pathao{{ $value->id }}"
-                                                        class="btn btn-success">pathao</a>
                                                 </div>
                                             </td>
-                                            <td><a href="{{ route('admin.order.slip', ['id' => $value->id]) }}">
+                                            <td><a
+                                                    href="{{ route('admin.order.slip', ['id' => $value->id]) }}">
                                                     <u>{{ $value->invoice_id }}</u>
                                                 </a>
                                                 <br> {{ $value->customer_ip }}
@@ -152,7 +131,7 @@
                                             <td>
                                                 @if ($value->ordernote)
                                                     <p>{{ $value->ordernote->note }}</p>
-                                                    <a data-bs-toggle="modal" data-bs-target="#orderNote{{ $value->id }}" class="btn btn-dark cursor-pointer"
+                                                    <a data-bs-toggle="modal" data-bs-target="#orderNote{{ $value->id }}"
                                                         title="Order Note"><i class="fe-file-text"></i></a>
                                                 @else
                                                     <p></p>
@@ -412,6 +391,7 @@
                                             </div>
                                         </div>
 
+
                                         <table class="cart_table table table-bordered table-striped text-center mb-0">
                                             <thead>
                                                 <tr>
@@ -482,8 +462,7 @@
                                         <table class="cart_table table table-bordered table-striped text-center mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 30%;">Date</th>
-                                                    <th style="width: 30%;">User Name</th>
+                                                    <th style="width: 60%;">Date</th>
                                                     <th style="width: 40%;">Note</th>
                                                 </tr>
                                             </thead>
@@ -494,9 +473,6 @@
                                                         <td style="width: 60%;">
                                                             {{ date('d-m-Y', strtotime($note->created_at)) }}<br>
                                                             {{ date('h:i:s a', strtotime($note->created_at)) }}
-                                                        </td>
-                                                        <td style="width: 30%;">
-                                                            {{ $note->user ? $note->user->name : '' }}
                                                         </td>
                                                         <td style="width: 40%;">{{ $note->note }}</td>
                                                     </tr>

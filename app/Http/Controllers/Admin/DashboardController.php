@@ -4,17 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Brian2694\Toastr\Facades\Toastr;
 use App\Models\Order;
 use App\Models\User;
-use App\Models\Product;
 use App\Models\Customer;
 use App\Models\OrderStatus;
 use Carbon\Carbon;
-use Session;
-use Toastr;
-use Auth;
-use DB;
 
 class DashboardController extends Controller
 {
@@ -35,7 +33,7 @@ class DashboardController extends Controller
         $latest_customer = Customer::latest()->limit(5)->get();
         return view('backEnd.admin.dashboard',compact('order_statuses','total_sale','today_order','today_sales',
          'current_month_sale','total_order','current_month_order','total_customer','latest_order','latest_customer'));
-        
+
     }
     public function changepassword(){
         return view('backEnd.admin.changepassword');
@@ -65,7 +63,7 @@ class DashboardController extends Controller
     }
     public function locked(){
         // only if user is logged in
-        
+
         Session::put('locked', true);
         return view('backEnd.auth.locked');
         return redirect()->route('login');

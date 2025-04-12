@@ -292,6 +292,22 @@
                         </li>
                         <!-- nav items -->
                         <li>
+                            <a href="#sidebar-trashed" data-bs-toggle="collapse">
+                                <i data-feather="shopping-cart"></i>
+                                <span> Admin Approval </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="sidebar-trashed">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('admin.orders.trashed') }}"><i
+                                                data-feather="file-plus"></i> All Trashed Order</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- nav items -->
+                        <li>
                             <a href="#siebar-product" data-bs-toggle="collapse">
                                 <i data-feather="database"></i>
                                 <span> Products </span>
@@ -459,39 +475,38 @@
                             </li>
                         @endcan
                         <!-- nav items -->
-                        @can('paymentgateway-list|smsgateway-list|courierapi-list')
 
-                            <li>
-                                <a href="#sidebar-api-integration" data-bs-toggle="collapse">
-                                    <i data-feather="save"></i>
-                                    <span> API Integration </span>
-                                    <span class="menu-arrow"></span>
-                                </a>
-                                <div class="collapse" id="sidebar-api-integration">
-                                    <ul class="nav-second-level">
-                                        @can('paymentgateway-list')
-                                            <li>
-                                                <a href="{{ route('paymentgeteway.manage') }}"><i data-feather="file-plus"></i>
-                                                    Payment Gateway</a>
-                                            </li>
-                                        @endcan
-                                        @can('smsgateway-list')
-                                            <li>
-                                                <a href="{{ route('smsgeteway.manage') }}"><i data-feather="file-plus"></i>
-                                                    SMS Gateway</a>
-                                            </li>
-                                        @endcan
-                                        @can('courierapi-list')
-                                            <li>
-                                                <a href="{{ route('courierapi.manage') }}"><i data-feather="file-plus"></i>
-                                                    Courier API</a>
-                                            </li>
-                                        @endcan
-                                    </ul>
-                                </div>
-                            </li>
-                            <!-- nav items end -->
-                        @endcan
+                        <li>
+                            <a href="#sidebar-api-integration" data-bs-toggle="collapse">
+                                <i data-feather="save"></i>
+                                <span> API Integration </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="sidebar-api-integration">
+                                <ul class="nav-second-level">
+                                    @can('paymentgateway-list')
+                                        <li>
+                                            <a href="{{ route('paymentgeteway.manage') }}"><i data-feather="file-plus"></i>
+                                                Payment Gateway</a>
+                                        </li>
+                                    @endcan
+                                    @can('smsgateway-list')
+                                        <li>
+                                            <a href="{{ route('smsgeteway.manage') }}"><i data-feather="file-plus"></i>
+                                                SMS Gateway</a>
+                                        </li>
+                                    @endcan
+                                    @can('courierapi-list')
+                                        <li>
+                                            <a href="{{ route('courierapi.manage') }}"><i data-feather="file-plus"></i>
+                                                Courier API</a>
+                                        </li>
+                                    @endcan
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- nav items end -->
+
                         <li>
                             <a href="#sidebar-pixel-gtm" data-bs-toggle="collapse">
                                 <i data-feather="save"></i>
@@ -522,10 +537,10 @@
                             <div class="collapse" id="siebar-sitesetting">
                                 <ul class="nav-second-level">
                                     @can('setting-list')
-                                    <li>
-                                        <a href="{{ route('settings.index') }}"><i data-feather="file-plus"></i>
-                                            General Setting</a>
-                                    </li>
+                                        <li>
+                                            <a href="{{ route('settings.index') }}"><i data-feather="file-plus"></i>
+                                                General Setting</a>
+                                        </li>
                                     @endcan
                                     <li>
                                         <a href="{{ route('features.index') }}"><i data-feather="file-plus"></i>
@@ -540,10 +555,10 @@
                                             Social Media</a>
                                     </li>
                                     @can('contact-list')
-                                    <li>
-                                        <a href="{{ route('contact.index') }}"><i data-feather="file-plus"></i>
-                                            Contact</a>
-                                    </li>
+                                        <li>
+                                            <a href="{{ route('contact.index') }}"><i data-feather="file-plus"></i>
+                                                Contact</a>
+                                        </li>
                                     @endcan
                                     <li>
                                         <a href="{{ route('pages.index') }}"><i data-feather="file-plus"></i> Create
